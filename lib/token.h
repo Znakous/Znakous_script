@@ -1,0 +1,64 @@
+#pragma once
+
+#include <optional>
+#include <string_view>
+#include <unordered_map>
+
+enum class TokenType {
+    eof,
+    func,
+    ret,
+    if_s, else_s,
+    number,
+    plus, minus, multiply, divide, mod,
+    eq, neq, less, greater, leq, geq,
+    lbrace, rbrace, 
+    lparen, rparen,
+    intliteral, stringliteral
+};
+
+
+struct Token {
+    TokenType type;
+    std::optional<std::string_view> value;
+    bool operator==(const Token&) const = default;
+};
+
+constexpr std::pair<std::string_view, Token> keywords[] = {
+    {"function", {TokenType::func, std::nullopt}},
+    {"return", {TokenType::ret, std::nullopt}},
+    {"if", {TokenType::if_s, std::nullopt}},
+    {"else", {TokenType::else_s, std::nullopt}},
+    {"(", {TokenType::lparen, std::nullopt}},
+    {")", {TokenType::rparen, std::nullopt}},
+    {"{", {TokenType::lbrace, std::nullopt}},
+    {"}", {TokenType::rbrace, std::nullopt}},
+    {"+", {TokenType::plus, std::nullopt}},
+    {"-", {TokenType::minus, std::nullopt}},
+    {"*", {TokenType::multiply, std::nullopt}},
+    {"/", {TokenType::divide, std::nullopt}},
+    {"%", {TokenType::mod, std::nullopt}},
+    {"==", {TokenType::eq, std::nullopt}},
+    {"<", {TokenType::less, std::nullopt}},
+    {">", {TokenType::greater, std::nullopt}},
+    {"<=", {TokenType::leq, std::nullopt}},
+    {">=", {TokenType::geq, std::nullopt}},
+    {"true", {TokenType::intliteral, "1"}},
+    {"false", {TokenType::intliteral, "0"}},
+};
+
+// struct IdentLookup {
+//     IdentLookup() : table_({
+        
+
+        
+//     }) {}
+
+//     bool Contains(std::string_view value) {
+//         return table_.contains(value);
+//     }
+//     void Add(std::string_view value, TokenType type) {
+//         table_[value] = type;
+//     }
+//     std::unordered_map<std::string_view, TokenType> table_ ;
+// };

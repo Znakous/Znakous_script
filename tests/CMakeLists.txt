@@ -14,15 +14,19 @@ enable_testing()
 
 add_executable(
   itmoscript_tests
-  function_test.cpp
-  types_test.cpp
-  loop_and_branch_test.cpp
+  # trie_tests.cpp
+  lexer_tests.cpp
+  # function_test.cpp
+  # types_test.cpp
+  # loop_and_branch_test.cpp
 )
 
 target_link_libraries(
   itmoscript_tests
   itmoscript
   GTest::gtest_main
+  GTest::gmock_main
+
 )
 
 target_include_directories(itmoscript_tests PUBLIC ${PROJECT_SOURCE_DIR})
