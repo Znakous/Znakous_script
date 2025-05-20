@@ -13,15 +13,17 @@
 class Lexer {
 public:
     Lexer(const char* data) // null-terminated data
-     : data_(data), cur_pos_(0), read_pos_(0) {
+     : data_(data), cur_pos_(0), read_pos_(0), derived_size(0) {
         ReadOne();
         for (const auto& keyword : keywords) {
             trie_.insert(keyword.first, keyword.second);
         }
+        for_peeks_ = NextToken();
     }
 
     void ReadOne() {
         if (data_[read_pos_] == '\0') {
+            derived_size = read_pos_;
             cur_char_ = 0;
         } else {
             cur_char_ = data_[read_pos_];
@@ -29,8 +31,40 @@ public:
         cur_pos_ = read_pos_++;
 
     }
+    Token PeekToken() {
+        return for_peeks_;
+    }
+    Token GetToken() {
+        if (for_peeks_.type == TokenType::invalid) {
+            return for_peeks_;
+        }
+        Token t = for_peeks_;
+        for_peeks_ = NextToken();
+        return t;
+    }
+private:
+    void FindNext(char symbol) {
+        while(cur_char_ !=  symbol && cur_char_ != 0) {
+            ReadOne();
+        }
+    }
+    void FindNumber(bool met_e=false, bool e_was_last=false) {
+        ReadOne();
+        if (std::isdigit(cur_char_)) {
+            FindNumber(met_e, false);
+        } else if (cur_char_ == 'e') {
+            if (met_e) {
+                return;
+            } else {
+                FindNumber(true, true);
+            }
+        } else if (cur_char_ == '-' && e_was_last) {
+            FindNumber(met_e, false);
+        }
+        return;
+    }
 
-    std::optional<Token> GetToken() {
+    Token NextToken() {
         std::cout << "getting token\n";
         uint32_t start = cur_pos_;
         auto resp = trie_.get(data_ + start);
@@ -58,32 +92,14 @@ public:
             }
         }
         std::cout << "nothing\n";
-        return std::nullopt;
+        return Token(TokenType::invalid, std::nullopt);
     }
-private:
-    void FindNext(char symbol) {
-        while(cur_char_ !=  symbol && cur_char_ != 0) {
-            ReadOne();
-        }
-    }
-    void FindNumber(bool met_e=false, bool e_was_last=false) {
-        ReadOne();
-        if (std::isdigit(cur_char_)) {
-            FindNumber(met_e, false);
-        } else if (cur_char_ == 'e') {
-            if (met_e) {
-                return;
-            } else {
-                FindNumber(true, true);
-            }
-        } else if (cur_char_ == '-' && e_was_last) {
-            FindNumber(met_e, false);
-        }
-        return;
-    }
+
     const char* data_;
+    size_t derived_size;
     uint32_t cur_pos_;
     uint32_t read_pos_;
     char cur_char_;
     Trie<Token> trie_;
+    Token for_peeks_;
 };

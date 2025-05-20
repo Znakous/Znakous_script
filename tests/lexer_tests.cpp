@@ -14,15 +14,17 @@ TEST(LexerTests, SimpleTest) {
     std::cout << "constructed lexer\n";
     std::vector<Token> tokens;
     std::vector<Token> tokens_exp{{TokenType::func, std::nullopt}, {TokenType::stringliteral, "chumba-umba"}, {TokenType::intliteral, "567"}, {TokenType::plus, std::nullopt}, {TokenType::intliteral, "1e45"}, {TokenType::minus, std::nullopt}, {TokenType::intliteral, "14e-8"}, {TokenType::divide, std::nullopt}, {TokenType::leq, std::nullopt}};
-    while(auto ans = lex.GetToken()) {
-        tokens.push_back(ans.value());
-        std::cout << (int) ans.value().type << "\n";
-        if (ans.value().type == TokenType::stringliteral) {
-            std::cout << "val: " << ans.value().value.value() << "\n";
+    auto ans = lex.GetToken();
+    while(ans.type != TokenType::invalid) {
+        tokens.push_back(ans);
+        // std::cout << (int) ans.type << "\n";
+        if (ans.type == TokenType::stringliteral) {
+            std::cout << "val: " << ans.value.value() << "\n";
         }
-        if (ans.value().type == TokenType::intliteral) {
-            std::cout << "valint: " << ans.value().value.value() << "\n";
+        if (ans.type == TokenType::intliteral) {
+            std::cout << "valint: " << ans.value.value() << "\n";
         }
+        ans = lex.GetToken();
     }
     ASSERT_THAT(tokens, testing::ElementsAreArray(tokens_exp));
 }

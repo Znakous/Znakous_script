@@ -8,13 +8,18 @@ enum class TokenType {
     eof,
     func,
     ret,
-    if_s, else_s,
+    if_s, elif_s, else_s,
     number,
     plus, minus, multiply, divide, mod,
     eq, neq, less, greater, leq, geq,
     lbrace, rbrace, 
     lparen, rparen,
-    intliteral, stringliteral
+    intliteral, stringliteral,
+    invalid,
+    then,
+    ident,
+    for_s, while_s, in_s,
+    assign,
 };
 
 
@@ -28,11 +33,17 @@ constexpr std::pair<std::string_view, Token> keywords[] = {
     {"function", {TokenType::func, std::nullopt}},
     {"return", {TokenType::ret, std::nullopt}},
     {"if", {TokenType::if_s, std::nullopt}},
+    {"elif", {TokenType::elif_s, std::nullopt}},
     {"else", {TokenType::else_s, std::nullopt}},
+    {"then", {TokenType::then, std::nullopt}},
+    {"for", {TokenType::for_s, std::nullopt}},
+    {"while", {TokenType::while_s, std::nullopt}},
+    {"in", {TokenType::in_s, std::nullopt}},
     {"(", {TokenType::lparen, std::nullopt}},
     {")", {TokenType::rparen, std::nullopt}},
     {"{", {TokenType::lbrace, std::nullopt}},
     {"}", {TokenType::rbrace, std::nullopt}},
+    {"=", {TokenType::assign, std::nullopt}},
     {"+", {TokenType::plus, std::nullopt}},
     {"-", {TokenType::minus, std::nullopt}},
     {"*", {TokenType::multiply, std::nullopt}},
@@ -46,6 +57,13 @@ constexpr std::pair<std::string_view, Token> keywords[] = {
     {"true", {TokenType::intliteral, "1"}},
     {"false", {TokenType::intliteral, "0"}},
 };
+
+bool IsPrefixOperator(TokenType type) {
+    return (type == TokenType::plus) || (type == TokenType::minus);
+}
+
+
+// constexpr bool allowed_in_identifier[255];
 
 // struct IdentLookup {
 //     IdentLookup() : table_({

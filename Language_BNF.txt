@@ -1,0 +1,23 @@
+// BNF representation of language
+
+Program := Statement*
+
+Statement := IfStatement | CycleStatement | AssignStatement | EmptyStetement
+
+IfStatement := if Expression then Statement (ElseIfStatement)* (ElseStatement)? endif
+
+ElseIfStatement := elseif Expression then Statement
+
+ElseStatement := else Statement
+
+AssignStatement := Identifier = Expression
+
+CycleStatement := ForStatement | WhileStatement
+
+ForStatement := for Identifier in 
+
+Expression := Expression[n] // highest level expression
+
+Expression[i] := Expression[i-1] ((some i-th level operand) Expression[i-1]) *
+
+Expression[0] := function(Identifier) // last level
