@@ -91,3 +91,7 @@ struct AssignStatement : Statement {
     ptr<Identifier> ident;
     ptr<Expression> expr;
 };
+
+struct Program : Node {
+    std::vector<ptr<Statement>> statements;
+};

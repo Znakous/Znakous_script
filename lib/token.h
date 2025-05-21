@@ -58,10 +58,19 @@ constexpr std::pair<std::string_view, Token> keywords[] = {
     {"false", {TokenType::intliteral, "0"}},
 };
 
-bool IsPrefixOperator(TokenType type) {
-    return (type == TokenType::plus) || (type == TokenType::minus);
-}
+bool IsPrefixOperator(TokenType type);
 
+template<size_t Level>
+bool IsLevelOperator(Token token) = delete;
+
+template<>
+bool IsLevelOperator<1>(Token token);
+
+template<>
+bool IsLevelOperator<2>(Token token);
+
+template<>
+bool IsLevelOperator<3>(Token token);
 
 // constexpr bool allowed_in_identifier[255];
 
