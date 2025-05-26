@@ -4,7 +4,7 @@ Lexer::Lexer(const char* data) // null-terminated data
     : data_(data), cur_pos_(0), read_pos_(0), derived_size(0) {
     ReadOne();
     for (const auto& keyword : keywords) {
-        trie_.insert(keyword.first, keyword.second);
+        keywords_.insert(keyword.first, keyword.second);
     }
     for_peeks_ = NextToken();
 }
@@ -54,7 +54,7 @@ void Lexer::FindNumber(bool met_e=false, bool e_was_last=false) {
 Token Lexer::NextToken() {
     std::cout << "getting token\n";
     uint32_t start = cur_pos_;
-    auto resp = trie_.get(data_ + start);
+    auto resp = keywords_.get(data_ + start);
     if (resp.has_value()) {
         std::cout << "keyword\n";
         uint32_t size = resp.value().size;

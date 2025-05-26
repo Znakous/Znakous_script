@@ -5,8 +5,8 @@ bool IsPrefixOperator(TokenType type) {
     return (type == TokenType::plus) || (type == TokenType::minus);
 }
 
-template<size_t Level>
-bool IsLevelOperator(Token token) = delete;
+// template<size_t Level>
+// bool IsLevelOperator(Token token) = delete;
 
 template<>
 bool IsLevelOperator<1>(Token token) {

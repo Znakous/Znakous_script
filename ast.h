@@ -7,21 +7,16 @@
 #include <tuple>
 #include <memory>
 
-template<typename T>
-using ptr = std::shared_ptr<T>;
 
-template<typename T>
-auto& make_ptr = std::make_shared<T>;
 
 constexpr size_t operators_levels = 3;
 
-struct Node {};
+struct Node {
+    virtual ~Node() = default;
+};
 
 template<size_t Level>
 struct Operator : Node {};
-
-// template<>
-// struct Operator<1> : Node {};
 
 struct UnaryMinus : Operator<1> {};
 struct UnaryPlus : Operator<1> {};
@@ -41,13 +36,28 @@ struct ExpressionImpl<0> {
 
 using Expression = ExpressionImpl<operators_levels>;
 
-struct LiteralExpression : ExpressionImpl<0> {
+struct LiteralExpression : ExpressionImpl<0> {};
+
+struct IntLiteralExpression : LiteralExpression {
+    Token literal;
+};
+
+struct StringLiteralExpression : LiteralExpression {
     Token literal;
 };
 
 struct FunctionalExpression : ExpressionImpl<0> {
     Token func_keyword;
     ptr<Expression> underlying;
+};
+
+struct IdentifierExpression : ExpressionImpl<0> {
+    Token identifier;
+};
+
+struct FunctionCallExpression : ExpressionImpl<0> {
+    ptr<IdentifierExpression> function;
+    std::vector<ptr<Expression>> arguments;
 };
 
 struct PrefixExpression : ExpressionImpl<0> {

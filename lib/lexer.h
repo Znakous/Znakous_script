@@ -28,6 +28,6 @@ private:
     uint32_t cur_pos_;
     uint32_t read_pos_;
     char cur_char_;
-    Trie<Token> trie_;
+    Trie<Token> keywords_;
     Token for_peeks_;
 };

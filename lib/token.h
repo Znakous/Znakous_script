@@ -71,7 +71,6 @@ bool IsLevelOperator<2>(Token token);
 
 template<>
 bool IsLevelOperator<3>(Token token);
-
 // constexpr bool allowed_in_identifier[255];
 
 // struct IdentLookup {
