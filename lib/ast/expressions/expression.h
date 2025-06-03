@@ -3,13 +3,13 @@
 #include <variant>
 #include <vector>
 #include <algorithm>
+#include <optional>
 
-
-#include <token.h>
-#include <usings.h>
-#include <ast/statements/statement_fwd.h>
-#include <ast/expressions/expression_fwd.h>
-
+#include "../../../lib/token.h"
+#include "../../../lib/usings.h"
+#include "../../../lib/environment_fwd.h"
+#include "expression_fwd.h"
+#include "../statements/statement_fwd.h"
 
 
 template<size_t Level>
@@ -85,6 +85,6 @@ struct ExpressionImpl<0> {
 struct FunctionalExpression {
     std::vector<Statement> body;
     std::vector<std::string_view> arguments;
-    // Expression return_s;
+    ptr<Environment> closure_env;
 };
 

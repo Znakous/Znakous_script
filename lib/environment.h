@@ -3,6 +3,7 @@
 #include "usings.h"
 #include "trie.h"
 #include "object.h"
+#include "environment_fwd.h"
 
 struct Environment {
     Environment()
@@ -11,38 +12,59 @@ struct Environment {
     Environment(Environment* parent)
      : namespc_(new Trie<Object>()), parent_(parent) 
     {}
+    Environment(const Environment& other) 
+     : namespc_(new Trie<Object>()), 
+       parent_(nullptr)  
+    {
+        *namespc_ = *other.namespc_;
+    }
+    
+    Environment& operator=(const Environment& other) {
+        if (this != &other) {
+            delete namespc_;
+            namespc_ = new Trie<Object>();
+            *namespc_ = *other.namespc_;
+            parent_ = nullptr;  
+        }
+        return *this;
+    }
+
     ~Environment() {
         delete namespc_;
     }
+
     Environment* GetParent() { return parent_; }
 
     std::optional<Object> GetByIdent(std::string_view ident) {
         auto resp = namespc_->get(ident.data());
         if (!resp.has_value()) {
-            return FromParent(ident);
+            if (parent_) {
+                return parent_->GetByIdent(ident);
+            }
+            return std::nullopt;
         } 
         if (resp.value().size != ident.size()) {
-            // maybe you mean ...
+            return std::nullopt;
         }
         return resp->param;
     }
+
     Object& operator[](std::string_view ident) {
         std::cout << "resolving ident " << ident << "\n";
-        if (!namespc_->get(ident.data()).has_value()) {
-            return FromParent(ident);
+        auto resp = namespc_->get(ident.data());
+        if (!resp.has_value()) {
+            if (parent_) {
+                auto parent_val = parent_->GetByIdent(ident);
+                if (parent_val) {
+                    namespc_->insert(ident, parent_val.value());
+                    return namespc_->get_nocheck(ident.data());
+                }
+            }
+            namespc_->insert(ident, CNull());
         }
-        Object& resp = namespc_->get_nocheck(ident.data());
-        return resp;
+        return namespc_->get_nocheck(ident.data());
     }
-    Object& FromParent(std::string_view ident) {
-        std::cout << "ask parent\n";
-        if (parent_) {
-            return (*parent_)[ident];
-        } else {
-            std::cout << "!!!!!!!!!!!!! ident unresolved with parent\n";
-        }
-        // pupupu
-    }
+
     void Declare(std::string_view ident) {
         std::cout << "declaring   " << ident << "\n";
         if (!namespc_->get(ident.data())){
@@ -50,6 +72,13 @@ struct Environment {
             namespc_->insert(ident, CNull());
         }
     }
+
+    void CopyFrom(const Environment& other) {
+        delete namespc_;
+        namespc_ = new Trie<Object>();
+        *namespc_ = *other.namespc_;
+    }
+
     Trie<Object>* namespc_;
     Environment* parent_;
 };
@@ -59,11 +88,17 @@ struct EnvironmentMaster {
      : current(new Environment()) 
     {}
 
-    void Enclose() {
+    void Enclose(Environment* closure_env = nullptr) {
         std::cout << "enclose !!!!!!!!!!!!!!!\n";
-        Environment* new_one = new Environment(current);
+        Environment* parent = closure_env ? closure_env : current;
+        Environment* new_one = new Environment(parent);
         current = new_one;
-    } 
+    }
+
+    Environment GetCurrentEnvironment() const {
+        return Environment(*current);
+    }
+
     void OutClose() {
         std::cout << "outclose !!!!!!!!!!!!!!!1\n";
         Environment* parent = current->GetParent();

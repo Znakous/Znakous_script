@@ -53,6 +53,11 @@ Stopping Evaluator::operator()(ptr<AssignStatement>& expr) {
 Stopping Evaluator::operator()(ptr<ReturnStatement>& ret_st) {
     std::cout << "ret state\n";
     return_object_ = std::visit(*this, ret_st->value);
+    if (auto func = std::get_if<ptr<FunctionalExpression>>(&return_object_.value())) {
+        if (!(*func)->closure_env) {
+            (*func)->closure_env = make_ptr<Environment>(*env_.current);
+        }
+    }
     return Stopping::return_s;
     // auto ret = make_ptr<Object>();
     // *ret = std::string("aaaaaa");
@@ -81,21 +86,24 @@ Object Evaluator::operator()(ptr<FunctionCallExpression>& expr) {
     auto function = (env_[expr->function]);
     std::cout << "hui\n";
 
-    // if (!function.has_value()) {
-    //     std::cout << "aaaaaaaaa wrong func\n";
-    //     // unknown function identifier
-    // }
     std::cout << function.index() << " <----\n";
     ptr<FunctionalExpression> to_invoke
          = std::get<ptr<FunctionalExpression>>
          (function);
     std::cout << "know what to invoke\n";
+    
     env_.Enclose();
-    for (int i =0;i<to_invoke->arguments.size(); ++i) {
+    
+    if (to_invoke->closure_env) {
+        env_.current->CopyFrom(*to_invoke->closure_env);
+    }
+    
+    for (int i = 0; i < to_invoke->arguments.size(); ++i) {
         std::cout << "get val for " << to_invoke->arguments[i] << "\n";
         env_.Declare(to_invoke->arguments[i]);
         env_[to_invoke->arguments[i]] = std::visit(*this, expr->arguments[i]);
     }
+    
     for (decltype(auto) st : to_invoke->body) {
         Stopping stop_res = std::visit(*this, st);
         if (stop_res == Stopping::return_s) {
@@ -106,9 +114,8 @@ Object Evaluator::operator()(ptr<FunctionCallExpression>& expr) {
     }
     
     std::cout << "func did't return !!!!!!!!!!!!!!!\n";
+    env_.OutClose();
     return CNull();
-    // auto res = std::visit(*this, to_invoke->return_s);
-    // return res;
 }
 Object Evaluator::operator()(ptr<IdentifierExpression>& expr) {
     std::cout << "identifier\n";
@@ -118,6 +125,7 @@ Object Evaluator::operator()(ptr<IdentifierExpression>& expr) {
 }
 
 Object Evaluator::operator()(ptr<FunctionalExpression>& expr) {
+    expr->closure_env = make_ptr<Environment>(*env_.current);
     return expr;
 }
 Object Evaluator::operator()(ptr<ScopedExpression>& expr) {
