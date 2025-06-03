@@ -52,7 +52,7 @@ struct Environment {
     Object& operator[](std::string_view ident) {
         std::cout << "resolving ident " << ident << "\n";
         auto resp = namespc_->get(ident.data());
-        if (!resp.has_value()) {
+        if (!resp.has_value() || resp.value().size != ident.size()) {
             if (parent_) {
                 auto parent_val = parent_->GetByIdent(ident);
                 if (parent_val) {
@@ -62,6 +62,9 @@ struct Environment {
             }
             namespc_->insert(ident, CNull());
         }
+        // if (resp.value().size != ident.size()) {
+        //     return std::nullopt;
+        // }
         return namespc_->get_nocheck(ident.data());
     }
 

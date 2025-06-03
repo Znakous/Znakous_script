@@ -31,6 +31,10 @@ Statement Parser::ParseStatement() {
             return ParseAssignStatement();
         } else if (cur_token_.type == TokenType::ret) {
             return ParseReturnStatement();
+        } else if (cur_token_.type == TokenType::while_s) {
+            return ParseWhileStatement();
+        } else {
+            return ParseExprStatement();
         }
     } else {
         std::cout << "invalid statement\n";
@@ -97,6 +101,22 @@ Expression Parser::ParseExpression() {
     // return expr;
 }
 
+ptr<ExprStatement> Parser::ParseExprStatement() {
+    ptr<ExprStatement> ans = make_ptr<ExprStatement>();
+    ans->expr = ParseExpression();
+    return ans;
+}
+
+ptr<WhileStatement> Parser::ParseWhileStatement() {
+    ptr<WhileStatement> ans = make_ptr<WhileStatement>();
+    AdvanceTokens();
+    ans->condition = ParseExpression();
+    while (cur_token_.type != TokenType::endwhile) {
+        ans->body.push_back(ParseStatement());
+    }
+    AdvanceTokens();
+    return ans;
+}
 
 ptr<ReturnStatement> Parser::ParseReturnStatement() {
     ptr<ReturnStatement> ans = make_ptr<ReturnStatement>();

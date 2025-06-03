@@ -64,6 +64,29 @@ Stopping Evaluator::operator()(ptr<ReturnStatement>& ret_st) {
     // return ret;
     // return ret;
 }
+
+Stopping Evaluator::operator()(ptr<ExprStatement>& expr) {
+    std::visit(*this, expr->expr);
+    return Stopping::none;
+}
+
+Stopping Evaluator::operator()(ptr<WhileStatement>& expr) {
+    std::cout << "while statement\n";
+    while (std::visit(TruthChecker{}, std::visit(*this, expr->condition))) {
+        std::cout << "while body\n";
+        for (decltype(auto) el : expr->body) {
+            auto stop_res = std::visit(*this, el);
+            if (stop_res == Stopping::break_s) {
+                break;
+            } else if (stop_res == Stopping::return_s) {
+                return Stopping::return_s;
+            } else if (stop_res == Stopping::continue_s) {
+                continue;
+            }
+        }
+    }
+    return Stopping::none;
+}
 Object Evaluator::operator()(ptr<IntLiteralExpression>& expr) {
     std::cout << "int literal\n";
     return stoi_view(expr->literal.value.value());

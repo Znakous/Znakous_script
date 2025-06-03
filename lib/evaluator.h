@@ -69,6 +69,8 @@ struct Evaluator {
     Stopping operator()(ptr<IfStatement>& expr);
     Stopping operator()(ptr<AssignStatement>& expr);
     Stopping operator()(ptr<ReturnStatement>& expr);
+    Stopping operator()(ptr<WhileStatement>& expr);
+    Stopping operator()(ptr<ExprStatement>& expr);
 
     Object operator()(ptr<IntLiteralExpression>& expr);
     Object operator()(ptr<StringLiteralExpression>& expr);

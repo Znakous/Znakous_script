@@ -51,3 +51,11 @@ struct ReturnStatement {
 struct ExprStatement {
     Expression expr;
 };
+
+struct WhileStatement {
+    Expression condition;
+    std::vector<Statement> body;
+};
+
+
+

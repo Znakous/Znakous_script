@@ -13,6 +13,9 @@ struct Parser {
 
     ptr<Program> ParseProgram();
 
+    ptr<ExprStatement> ParseExprStatement();
+    ptr<WhileStatement> ParseWhileStatement();
+
     Expression ParseExpression();
 
     template<size_t Level>

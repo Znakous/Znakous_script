@@ -97,11 +97,27 @@ TEST(InterPreterTests, ClosureRecursionTest) {
             return factorial
         endfunction
         
-        ans = makeFactorial(13)
-        r = print(ans(5))
+        fact = makeFactorial(13)
+        r = print(fact(5))
     )";
     Interpreter p(code, test);
     auto el = p.ParseProgram();
     p.Evaluate(el);
     ASSERT_EQ(test.str(), "120");
 }
+
+
+TEST(InterPreterTests, WhileTest) {
+    std::ostringstream test;
+    std::string code = R"(
+        i = 0
+        while (i - 10)
+            i = i + 1
+        endwhile
+        print (i)
+    )";
+    Interpreter p(code, test);
+    auto el = p.ParseProgram();
+    p.Evaluate(el);
+    ASSERT_EQ(test.str(), "10");
+}   
