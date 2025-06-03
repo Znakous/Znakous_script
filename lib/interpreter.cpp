@@ -1,5 +1,6 @@
 #include "interpreter.h"
 
-bool interpret(std::istream& input, std::ostream& output) {
-    return false;
-}
+// bool interpret(std::istringstream& input, std::ostream& output) {
+//     Interpreter inter(input.str(), output);
+
+// }

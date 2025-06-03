@@ -10,5 +10,14 @@ TEST(ParserTests, SimpleTest) {
     Preprocessor prep(code);
 
     Parser p(prep.GetCode());
+    auto el = p.ParseProgram();
+    
+}
+TEST(ParserTests, OnePlusOneTest) {
+    std::string code = R"(a=1+1)";
+    Preprocessor prep(code);
+
+    Parser p(prep.GetCode());
+    p.ParseProgram();
     
 }

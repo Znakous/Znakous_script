@@ -7,21 +7,25 @@
 struct Parser {
     Parser(const char* data);
     void AdvanceTokens();
-    ptr<Statement> ParseStatement();
+    Statement ParseStatement();
     
     ptr<AssignStatement> ParseAssignStatement();
 
     ptr<Program> ParseProgram();
 
-    ptr<Expression> ParseExpression();
+    Expression ParseExpression();
 
     template<size_t Level>
     ptr<ExpressionImpl<Level>> ParseLeveledExpression() {
+        std::cout << "parsing leveled " << Level << "\n";
+
         ptr<ExpressionImpl<Level>> expr = make_ptr<ExpressionImpl<Level>>();
         expr->first = ParseLeveledExpression<Level-1>();
         while(true) {
             if (IsLevelOperator<Level>(cur_token_)) {
-                expr->others.emplace_back(cur_token_, ParseLeveledExpression<Level-1>());
+                auto oper = cur_token_;
+                AdvanceTokens();
+                expr->others.emplace_back(oper, ParseLeveledExpression<Level-1>());
             } else {
                 break;
             }
@@ -32,8 +36,11 @@ struct Parser {
 
     template<>
     ptr<ExpressionImpl<1>> ParseLeveledExpression() {
+        std::cout << "parsing leveled " << 1 << "\n";
+
         ptr<ExpressionImpl<1>> ans = make_ptr<ExpressionImpl<1>>();
         if (IsPrefixOperator(cur_token_.type)) {
+            std::cout << "ddddf is that\n";
             ans->prefix_oper = cur_token_;
             AdvanceTokens();
             ans->underlying = ParseLeveledExpression<0>();
@@ -41,66 +48,78 @@ struct Parser {
         }
         else {
             ans->prefix_oper = std::nullopt;
-            AdvanceTokens();
+            // AdvanceTokens();
             ans->underlying = ParseLeveledExpression<0>();
             return ans;
         }
     }
     template<>
     ptr<ExpressionImpl<0>> ParseLeveledExpression() {
+        std::cout << "parsing level 0\n"; 
+        std::cout << "token " << (int) cur_token_.type << "\n";
         ptr<ExpressionImpl<0>> ans = make_ptr<ExpressionImpl<0>>();
         if (cur_token_.type == TokenType::lparen) {
+            std::cout << "lparen seen\n"; 
             AdvanceTokens();
             ptr<ScopedExpression> scoped 
                 = make_ptr<ScopedExpression>();
             scoped->underlying = ParseExpression();            
             AdvanceTokens();
+            // AdvanceTokens();
             ans->value = scoped;
             // Expect that skiped ')'
             // return ans;
-        } else if (cur_token_.type == TokenType::number) {
+        } else if (cur_token_.type == TokenType::intliteral) {
+            std::cout << "it's number!!\n";
             auto lit = make_ptr<IntLiteralExpression>();
             lit->literal = cur_token_;
             AdvanceTokens();
             ans->value = lit;
             // return ans;
         } else if (cur_token_.type == TokenType::stringliteral) {
+            std::cout << "string literal\n";
             auto lit = make_ptr<StringLiteralExpression>();
             lit->literal = cur_token_;
             AdvanceTokens();
             ans->value = lit;
             // return ans;
-        } else if (cur_token_.type == TokenType::ident) {
-            if (peek_token_.type == TokenType::lparen) {
-                auto call = make_ptr<FunctionCallExpression>();
-                call->function = cur_token_.value.value();
-                AdvanceTokens();
-                call->arguments = ParseArguments();
-                // while (cur_token_.type != TokenType::rparen) {
-                //     call->arguments.push_back(ParseExpression());
-                //     // if (cur_token_.type == TokenType::comma) AdvanceTokens();
-                // }
-                AdvanceTokens();
-                ans->value = call;
-                // return ans;
-            } else {
-                auto ident = make_ptr<IdentifierExpression>();
-                ident->name = cur_token_.value.value();
-                AdvanceTokens();
-                ans->value = ident;
-                // return ans;
-            }
+        } else if ((cur_token_.type == TokenType::ident || cur_token_.type == TokenType::stdfunc) && peek_token_.type == TokenType::lparen) {
+            std::cout << "i make func call\n";
+            auto call = make_ptr<FunctionCallExpression>();
+            call->function = cur_token_.value.value();
+            call->token = cur_token_;
+            AdvanceTokens();
+            call->arguments = ParseArguments();
+            // while (cur_token_.type != TokenType::rparen) {
+            //     call->arguments.push_back(ParseExpression());
+            //     // if (cur_token_.type == TokenType::comma) AdvanceTokens();
+            // }
+            // AdvanceTokens();
+            ans->value = call;
+            std::cout << "i parsedfunc call\n";
+            // return ans;
+        } 
+        else if (cur_token_.type == TokenType::ident) {
+            std::cout << "it's ident\n";
+            auto ident = make_ptr<IdentifierExpression>();
+            ident->name = cur_token_.value.value();
+            AdvanceTokens();
+            ans->value = ident;
+            // return ans;
         }
+        std::cout << "wdf is that\n";
+        std::cout << (int) cur_token_.type;
         return ans;
     }
 
-    ptr<Expression> ParseReturnStatement();
+    ptr<ReturnStatement> ParseReturnStatement();
     ptr<IfStatement> ParseIfStatement();
 
     std::optional<ptr<ElseIfStatement>> ParseElseIfs();
     std::optional<ptr<ElseStatement>> ParseElseStatement();
 private:
-    std::vector<ptr<IdentifierExpression>> ParseArguments();
+
+    std::vector<Expression> ParseArguments();
     Lexer lexer_;
     Token cur_token_;
     Token peek_token_;

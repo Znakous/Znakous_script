@@ -6,6 +6,7 @@
 
 
 #include <token.h>
+#include <usings.h>
 #include <ast/statements/statement_fwd.h>
 #include <ast/expressions/expression_fwd.h>
 
@@ -39,11 +40,6 @@ template<>
 struct ExpressionImpl<0>;
 
 
-
-
-
-
-
 struct IntLiteralExpression {
     Token literal;
 };
@@ -53,8 +49,9 @@ struct StringLiteralExpression {
 };
 
 struct FunctionCallExpression {
+    Token token;
     std::string_view function;
-    std::vector<ptr<IdentifierExpression>> arguments;
+    std::vector<Expression> arguments;
 };
 
 struct IdentifierExpression {
@@ -62,7 +59,7 @@ struct IdentifierExpression {
 };
 
 struct ScopedExpression {
-    ptr<Expression> underlying;
+    Expression underlying;
 };
 
 template<size_t Level>
@@ -86,7 +83,8 @@ struct ExpressionImpl<0> {
 
 
 struct FunctionalExpression {
-    std::vector<ptr<Statement>> body;
-    ptr<Expression> return_s;
+    std::vector<Statement> body;
+    std::vector<std::string_view> arguments;
+    // Expression return_s;
 };
 

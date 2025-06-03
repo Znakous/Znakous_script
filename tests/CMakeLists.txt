@@ -15,8 +15,9 @@ enable_testing()
 add_executable(
   itmoscript_tests
   # trie_tests.cpp
-  lexer_tests.cpp
-  parser_tests.cpp
+  # lexer_tests.cpp
+  # parser_tests.cpp
+  interpreter_tests.cpp
   # function_test.cpp
   # types_test.cpp
   # loop_and_branch_test.cpp

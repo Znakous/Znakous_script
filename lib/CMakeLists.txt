@@ -1,1 +1,9 @@
-add_library(itmoscript interpreter.cpp parser.cpp lexer.cpp token.cpp)
+add_library(itmoscript
+ interpreter.cpp 
+ evaluator.cpp
+ parser.cpp 
+ lexer.cpp 
+ std_functions.cpp
+ preprocess.cpp 
+ token.cpp
+)

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <iostream>
+#include <functional>
 
 
 constexpr size_t operators_levels = 3;

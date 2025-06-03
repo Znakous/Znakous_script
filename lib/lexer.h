@@ -9,11 +9,10 @@
 #include "trie.h"
 
 
-
 class Lexer {
 public:
     Lexer(const char* data);
-
+    bool IsIdentSymbol();
     void ReadOne();
     Token PeekToken();
     Token GetToken();
@@ -23,11 +22,13 @@ private:
 
     Token NextToken();
 
+    std::string str_;
     const char* data_;
     size_t derived_size;
     uint32_t cur_pos_;
     uint32_t read_pos_;
     char cur_char_;
     Trie<Token> keywords_;
-    Token for_peeks_;
+    Trie<Token> identifiers_;
+    Token cur_token_;
 };

@@ -19,22 +19,32 @@ enum class TokenType {
     then,
     ident,
     for_s, while_s, in_s,
-    assign,
+    assign, endif, comma, endfunc,
+    stdfunc
 };
 
 
 struct Token {
+    constexpr Token()
+     : type(TokenType::invalid), value(std::nullopt) 
+    {}
+    constexpr Token(TokenType t, std::optional<std::string_view> val=std::nullopt)
+     : type(t), value(val) 
+    {}
     TokenType type;
     std::optional<std::string_view> value;
+    operator bool() {return type != TokenType::invalid;}
     bool operator==(const Token&) const = default;
 };
 
 constexpr std::pair<std::string_view, Token> keywords[] = {
     {"function", {TokenType::func, std::nullopt}},
+    {"endfunction", {TokenType::endfunc, std::nullopt}},
     {"return", {TokenType::ret, std::nullopt}},
     {"if", {TokenType::if_s, std::nullopt}},
     {"elif", {TokenType::elif_s, std::nullopt}},
     {"else", {TokenType::else_s, std::nullopt}},
+    {"endif", {TokenType::endif, std::nullopt}},
     {"then", {TokenType::then, std::nullopt}},
     {"for", {TokenType::for_s, std::nullopt}},
     {"while", {TokenType::while_s, std::nullopt}},
@@ -54,8 +64,13 @@ constexpr std::pair<std::string_view, Token> keywords[] = {
     {">", {TokenType::greater, std::nullopt}},
     {"<=", {TokenType::leq, std::nullopt}},
     {">=", {TokenType::geq, std::nullopt}},
+    {",", {TokenType::comma, std::nullopt}},
     {"true", {TokenType::intliteral, "1"}},
     {"false", {TokenType::intliteral, "0"}},
+};
+constexpr std::string_view std_funcs[] = {
+    "print",
+    "parsenum"
 };
 
 bool IsPrefixOperator(TokenType type);

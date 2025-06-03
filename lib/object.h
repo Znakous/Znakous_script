@@ -11,12 +11,22 @@
 
 #include "ast/ast.h"
 
+struct CNull{};
 
-using BuiltinFuncPtr = FunctionalExpression* ;
+inline std::ostream& operator<<(std::ostream& out, CNull) {
+    out << "Null";
+    return out;
+}
+
+using BuiltinFuncPtr = ptr<FunctionalExpression>;
 
 using Object = std::variant<
-    double,         // для Integer
-    std::string,    // для String
-    std::monostate,  // для Null
+    double,
+    std::string,
+    CNull,  // для Null
     BuiltinFuncPtr
+    // ,
+    // std::vector<std::variant<double,
+    // std::string,
+    // std::monostate>>
 >;
