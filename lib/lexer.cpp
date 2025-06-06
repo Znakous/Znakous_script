@@ -72,6 +72,7 @@ bool Lexer::IsIdentSymbol() {
 }
 void Lexer::FindNumber(bool met_e=false, bool e_was_last=false) {
     ReadOne();
+    std::cout << "find number\n";
     if (std::isdigit(cur_char_)) {
         FindNumber(met_e, false);
     } else if (cur_char_ == 'e' && std::isdigit(data_[read_pos_])) {
@@ -121,6 +122,7 @@ Token Lexer::NextToken() {
             std::cout << "found number\n";
             uint32_t first_digit = cur_pos_;
             FindNumber();
+            std::cout << "found number " << std::string_view(data_ + first_digit, data_ + cur_pos_) << "\n";
             return Token(TokenType::intliteral, std::string_view(data_ + first_digit, data_ + cur_pos_));
         }
          else if (cur_char_ != 0 && IsIdentSymbol()){

@@ -25,7 +25,14 @@ struct Program {
 struct AssignStatement {
     std::string_view ident;
     Expression expr;
+};  
+
+struct ArrayAssignStatement {
+    std::string_view array;
+    std::vector<Expression> indices;
+    Expression value;
 };
+
 
 struct IfStatement {
     Expression condition;
@@ -56,6 +63,10 @@ struct WhileStatement {
     Expression condition;
     std::vector<Statement> body;
 };
+
+struct BreakStatement {};
+
+struct ContinueStatement {};
 
 
 

@@ -102,6 +102,12 @@ struct AssignStatement : Statement {
     ptr<Expression> expr;
 };
 
+struct ArrayAssignStatement : Statement {
+    ptr<Expression> array;
+    ptr<Expression> index;
+    ptr<Expression> value;
+};
+
 struct Program : Node {
     std::vector<ptr<Statement>> statements;
 };
@@ -111,6 +117,6 @@ struct ArrayExpression : ExpressionImpl<0> {
 };
 
 struct ArrayAccessExpression : ExpressionImpl<0> {
-    ptr<Expression> array;
-    ptr<Expression> index;
+    std::string_view array;
+    std::vector<Expression> indices;
 };

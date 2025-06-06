@@ -2,12 +2,14 @@
 #include "std_functions.h"
 
 double stoi_view(std::string_view s) {
-    int ans = 0;
-    if (std::from_chars(s.data(), s.data() + s.size(), ans).ec
-            == std::errc::invalid_argument) {
-        throw std::invalid_argument("invalid stoi_view argument");
-    } 
-    return ans;
+    // int ans = 0;
+    // if (std::from_chars(s.data(), s.data() + s.size(), ans).ec
+    //         == std::errc::invalid_argument) {
+    //     throw std::invalid_argument("invalid stoi_view argument");
+    // } 
+    // std::cout << "stoi_view: " <<  << " " << s << "\n";
+    // throw std::runtime_error("stoi_view: " + std::to_string(ans));
+    return std::stod(s.data(), nullptr);
 }
 
 
@@ -79,11 +81,11 @@ Stopping Evaluator::operator()(ptr<WhileStatement>& expr) {
         for (decltype(auto) el : expr->body) {
             auto stop_res = std::visit(*this, el);
             if (stop_res == Stopping::break_s) {
-                break;
+                return Stopping::none; 
             } else if (stop_res == Stopping::return_s) {
                 return Stopping::return_s;
             } else if (stop_res == Stopping::continue_s) {
-                continue;
+                break;
             }
         }
     }
@@ -173,28 +175,79 @@ Object Evaluator::operator()(ptr<ArrayExpression>& expr) {
     return array;
 }
 
+std::pair<CArray*, size_t> Evaluator::traverse_array(CArray& root_array, std::vector<Expression>& indices) {
+    if (indices.empty()) {
+        throw std::runtime_error("No indices provided for array access");
+    }
+    
+    CArray* current_array = &root_array;
+    for (size_t i = 0; i < indices.size() - 1; ++i) {
+        Object index_obj = std::visit(*this, indices[i]);
+        size_t idx = std::get<double>(index_obj);
+        if (idx >= current_array->arr.size()) {
+            throw std::runtime_error("Array index out of bounds");
+        }
+        if (!std::holds_alternative<CArray>(current_array->arr[idx])) {
+            throw std::runtime_error("Attempting to index a non-array element");
+        }
+        current_array = &std::get<CArray>(current_array->arr[idx]);
+    }
+    
+    Object final_index_obj = std::visit(*this, indices.back());
+    size_t final_idx = std::get<double>(final_index_obj);
+    if (final_idx >= current_array->arr.size()) {
+        throw std::runtime_error("Array index out of bounds");
+    }
+    
+    return {current_array, final_idx};
+}
+
 Object Evaluator::operator()(ptr<ArrayAccessExpression>& expr) {
     std::cout << "array access eval\n";
     auto arr = (env_[expr->array]);
-    // Object index_obj = std::visit(*this, expr->index);
-    
     CArray& array = std::get<CArray>(arr);
-    Object index_obj = std::visit(*this, expr->index);
-    size_t idx = std::get<double>(index_obj);
-    if (idx < array.arr.size()) {
-        return array.arr[idx];
-    }
-    throw std::runtime_error("Array index out of bounds");
+    
+    auto [target_array, idx] = traverse_array(array, expr->indices);
+    return target_array->arr[idx];
+}
 
-    // if (auto array = std::get_if<CArray>(&array_obj)) {
-    //     if (auto index = std::get_if<double>(&index_obj)) {
-    //         size_t idx = static_cast<size_t>(*index);
-    //         if (idx < array->arr.size()) {
-    //             return array->arr[idx];
-    //         }
-    //         throw std::runtime_error("Array index out of bounds");
-    //     }
-    //     throw std::runtime_error("Array index must be a number");
-    // }
-    // throw std::runtime_error("Cannot index a non-array object");
+Stopping Evaluator::operator()(ptr<ArrayAssignStatement>& expr) {
+    std::cout << "array assignment eval\n";
+   
+    auto& arr = env_[expr->array];
+    CArray& array = std::get<CArray>(arr);
+    
+    Object value = std::visit(*this, expr->value);
+    
+    if (expr->indices.size() == 1) {
+        Object index_obj = std::visit(*this, expr->indices[0]);
+        size_t idx = std::get<double>(index_obj);
+        if (idx >= array.arr.size()) {
+            array.arr.resize(idx + 1);
+        }
+        array.arr[idx] = value;
+        return Stopping::none;
+    }
+    
+    CArray* current_array = &array;
+    for (size_t i = 0; i < expr->indices.size() - 1; ++i) {
+        Object index_obj = std::visit(*this, expr->indices[i]);
+        size_t idx = std::get<double>(index_obj);
+        if (idx >= current_array->arr.size()) {
+            current_array->arr.resize(idx + 1);
+        }
+        if (!std::holds_alternative<CArray>(current_array->arr[idx])) {
+            current_array->arr[idx] = CArray{};
+        }
+        current_array = &std::get<CArray>(current_array->arr[idx]);
+    }
+    
+    Object final_index_obj = std::visit(*this, expr->indices.back());
+    size_t final_idx = std::get<double>(final_index_obj);
+    if (final_idx >= current_array->arr.size()) {
+        current_array->arr.resize(final_idx + 1);
+    }
+    current_array->arr[final_idx] = value;
+    
+    return Stopping::none;
 }

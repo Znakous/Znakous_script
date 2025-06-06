@@ -26,9 +26,10 @@ add_executable(
   # function_test.cpp
   # types_test.cpp
   # loop_and_branch_test.cpp
-  # inerpreter_tests/simplests_tests.cpp
-  # inerpreter_tests/cycles_tests.cpp
+  inerpreter_tests/simplests_tests.cpp
+  inerpreter_tests/cycles_tests.cpp
   inerpreter_tests/arrays_tests.cpp
+  inerpreter_tests/weirdos_tests.cpp
   # inerpreter_tests/interpreter_tests.cpp
 )
 

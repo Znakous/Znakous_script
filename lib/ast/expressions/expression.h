@@ -96,6 +96,6 @@ struct ArrayExpression {
 
 struct ArrayAccessExpression {
     std::string_view array;
-    Expression index;
+    std::vector<Expression> indices;
 };
 

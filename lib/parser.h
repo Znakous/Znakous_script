@@ -9,7 +9,7 @@ struct Parser {
     void AdvanceTokens();
     Statement ParseStatement();
     
-    ptr<AssignStatement> ParseAssignStatement();
+    Statement ParseAssignStatement();
 
     ptr<Program> ParseProgram();
 
@@ -76,6 +76,7 @@ struct Parser {
             std::cout << "it's number!!\n";
             auto lit = make_ptr<IntLiteralExpression>();
             lit->literal = cur_token_;
+            std::cout << "number is " << lit->literal.value.value() << " " << lit->literal.value.value().size() << "\n";
             AdvanceTokens();
             ans->value = lit;
             // return ans;
@@ -105,9 +106,12 @@ struct Parser {
             auto access = make_ptr<ArrayAccessExpression>();
             access->array = cur_token_.value.value();
             AdvanceTokens(); // skip name
-            AdvanceTokens(); // skip [
-            access->index = ParseExpression();
-            AdvanceTokens(); // skip ]
+            
+            while (cur_token_.type == TokenType::lsquare) {
+                AdvanceTokens(); // skip [
+                access->indices.push_back(ParseExpression());
+                AdvanceTokens(); // skip ]
+            }
             ans->value = access;
         }
         else if ((cur_token_.type == TokenType::ident || cur_token_.type == TokenType::stdfunc) && peek_token_.type == TokenType::lparen) {

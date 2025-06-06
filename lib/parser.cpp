@@ -25,16 +25,24 @@ Statement Parser::ParseStatement() {
         if (cur_token_.type == TokenType::if_s) {
             std::cout << "---------- its if\n";
             return ParseIfStatement();
-        } else if (cur_token_.type == TokenType::ident 
-                    && peek_token_.type == TokenType::assign) {
-            std::cout << "to assign\n";
-            return ParseAssignStatement();
         } else if (cur_token_.type == TokenType::ret) {
             return ParseReturnStatement();
         } else if (cur_token_.type == TokenType::while_s) {
             return ParseWhileStatement();
+        } else if (cur_token_.type == TokenType::break_s) {
+            std::cout << "Found break statement\n";
+            AdvanceTokens();
+            auto stmt = make_ptr<BreakStatement>();
+            std::cout << "Created break statement\n";
+            return stmt;
+        } else if (cur_token_.type == TokenType::continue_s) {
+            std::cout << "Found continue statement\n";
+            AdvanceTokens();
+            auto stmt = make_ptr<ContinueStatement>();
+            std::cout << "Created continue statement\n";
+            return stmt;
         } else {
-            return ParseExprStatement();
+            return ParseAssignStatement();
         }
     } else {
         std::cout << "invalid statement\n";
@@ -43,16 +51,36 @@ Statement Parser::ParseStatement() {
     std::cout << "wrong parsed statement\n";
 }
 
-ptr<AssignStatement> Parser::ParseAssignStatement() {
-    ptr<AssignStatement> ans = make_ptr<AssignStatement>();
-    ans->ident = cur_token_.value.value();
-    std::cout << "in asssign\n";
-    std::cout << (int) cur_token_ << " <-";
+Statement Parser::ParseAssignStatement() {
+    std::cout << "parse assign\n";
+    if (cur_token_.type != TokenType::ident) {
+        std::cout << "not ident\n";
+        return ParseExprStatement();
+    }
+    if (peek_token_.type != TokenType::assign && peek_token_.type != TokenType::lsquare) {
+        std::cout << "not assign\n";
+        return ParseExprStatement();
+    }
+    std::string_view ident = cur_token_.value.value();
+    std::cout << "ident\n";
     AdvanceTokens();
-    std::cout << (int) cur_token_ << " <-";
-    AdvanceTokens();
-    std::cout << (int) cur_token_ << " <-";
-    ans->expr = ParseExpression();
+    if (!(cur_token_.type == TokenType::lsquare)) {
+        ptr<AssignStatement> ans = make_ptr<AssignStatement>();
+        ans->ident = ident;
+        AdvanceTokens();
+        ans->expr = ParseExpression();
+        return ans;
+    }
+    std::cout << "lsquare\n";
+    ptr<ArrayAssignStatement> ans = make_ptr<ArrayAssignStatement>();
+    ans->array = ident;
+    while (cur_token_.type == TokenType::lsquare) {
+        AdvanceTokens();
+        ans->indices.push_back(ParseExpression());
+        AdvanceTokens();
+    }
+    AdvanceTokens(); // skip =
+    ans->value = ParseExpression();
     return ans;
 }
 
@@ -113,6 +141,7 @@ ptr<WhileStatement> Parser::ParseWhileStatement() {
     ans->condition = ParseExpression();
     while (cur_token_.type != TokenType::endwhile) {
         ans->body.push_back(ParseStatement());
+        std::cout << "parsed stmt in while\n";
     }
     AdvanceTokens();
     return ans;

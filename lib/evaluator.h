@@ -61,6 +61,15 @@ struct Evaluator {
     Stopping operator()(ptr<ReturnStatement>& expr);
     Stopping operator()(ptr<WhileStatement>& expr);
     Stopping operator()(ptr<ExprStatement>& expr);
+    Stopping operator()(ptr<ArrayAssignStatement>& expr);
+    Stopping operator()(ptr<BreakStatement>&) { 
+        std::cout << "Evaluating break statement\n";
+        return Stopping::break_s; 
+    }
+    Stopping operator()(ptr<ContinueStatement>&) { 
+        std::cout << "Evaluating continue statement\n";
+        return Stopping::continue_s; 
+    }
 
     Object operator()(ptr<IntLiteralExpression>& expr);
     Object operator()(ptr<StringLiteralExpression>& expr);
@@ -74,6 +83,7 @@ struct Evaluator {
 
 private:
     Object ExecStd(ptr<FunctionCallExpression>& expr);
+    std::pair<CArray*, size_t> traverse_array(CArray& root_array, std::vector<Expression>& indices);
     std::optional<Object> return_object_;
     std::reference_wrapper<std::ostream> out_;
     EnvironmentMaster env_;
