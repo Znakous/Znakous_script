@@ -105,3 +105,12 @@ struct AssignStatement : Statement {
 struct Program : Node {
     std::vector<ptr<Statement>> statements;
 };
+
+struct ArrayExpression : ExpressionImpl<0> {
+    std::vector<Expression> elements;
+};
+
+struct ArrayAccessExpression : ExpressionImpl<0> {
+    ptr<Expression> array;
+    ptr<Expression> index;
+};

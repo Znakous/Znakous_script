@@ -86,7 +86,31 @@ struct Parser {
             AdvanceTokens();
             ans->value = lit;
             // return ans;
-        } else if ((cur_token_.type == TokenType::ident || cur_token_.type == TokenType::stdfunc) && peek_token_.type == TokenType::lparen) {
+        }else if (cur_token_.type == TokenType::lsquare) {
+            // Parse array literal
+            std::cout << "array literal\n";
+            ptr<ArrayExpression> array = make_ptr<ArrayExpression>();
+            AdvanceTokens(); // skip [
+            
+            while (cur_token_.type != TokenType::rsquare) {
+                array->elements.push_back(ParseExpression());
+                if (cur_token_.type == TokenType::comma) {
+                    AdvanceTokens();
+                }
+            }
+            AdvanceTokens(); // skip ]
+            ans->value = array;
+        } else if (cur_token_.type == TokenType::ident && peek_token_.type == TokenType::lsquare) {
+            std::cout << "array access parse\n";
+            auto access = make_ptr<ArrayAccessExpression>();
+            access->array = cur_token_.value.value();
+            AdvanceTokens(); // skip name
+            AdvanceTokens(); // skip [
+            access->index = ParseExpression();
+            AdvanceTokens(); // skip ]
+            ans->value = access;
+        }
+        else if ((cur_token_.type == TokenType::ident || cur_token_.type == TokenType::stdfunc) && peek_token_.type == TokenType::lparen) {
             std::cout << "i make func call\n";
             auto call = make_ptr<FunctionCallExpression>();
             call->function = cur_token_.value.value();

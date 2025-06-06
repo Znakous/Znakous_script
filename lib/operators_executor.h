@@ -9,7 +9,6 @@
 
 
 
-
 struct BinaryOperatorExecutor {
     BinaryOperatorExecutor() {
         visitors.emplace(TokenType::plus, std::make_unique<AddVisitor>());

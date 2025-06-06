@@ -6,7 +6,15 @@
 struct Printer {
     template<typename T>
     void operator()(T a) {
+        std::cout << "print called\n";
         out << a;
+    }
+    void operator()(CArray a) {
+        out << "[";
+        for (size_t i = 0; i < a.arr.size(); ++i) {
+            std::visit(Printer(out), a.arr[i]);
+        }
+        out << "]";
     }
     std::ostream& out;
 };
@@ -25,8 +33,6 @@ struct ParseNum {
     }
 };
 
-// using std_func = std::variant<Printer, ParseNum>;
-
 
 
 struct TruthChecker {
@@ -34,6 +40,7 @@ struct TruthChecker {
     bool operator()(const std::string& s);
     bool operator()(CNull);
     bool operator()(BuiltinFuncPtr);
+    bool operator()(CArray a);
 };
 
 

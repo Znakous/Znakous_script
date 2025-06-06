@@ -20,6 +20,10 @@ struct PrefixExpression;
 
 struct ScopedExpression;
 
+struct ArrayExpression;
+
+struct ArrayAccessExpression;
+
 // level-building
 
 template<size_t Level>
@@ -30,4 +34,5 @@ struct ExpressionImpl<0>;
 
 struct FunctionalExpression;
 
-using Expression = std::variant<ptr<FunctionalExpression>, ptr<ExpressionImpl<operators_levels>>>;
+using Expression = std::variant<ptr<FunctionalExpression>, 
+                ptr<ExpressionImpl<operators_levels>>>;

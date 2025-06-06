@@ -3,10 +3,10 @@
 #include <string>
 #include <variant>
 #include <memory>
+#include <vector>
 #include <ostream>
 #include "ast/expressions/expression_fwd.h"
 
-// #include <ast/statements/statement.h>
 
 struct CNull{};
 
@@ -17,13 +17,20 @@ inline std::ostream& operator<<(std::ostream& out, CNull) {
 
 using BuiltinFuncPtr = ptr<FunctionalExpression>;
 
-using Object = std::variant<
+using BuiltinArray = ptr<ArrayExpression>;
+
+struct Object;
+
+struct CArray {
+    std::vector<Object> arr;
+};
+
+struct Object : std::variant<
     double,
     std::string,
-    CNull,  // для Null
-    BuiltinFuncPtr
-    // ,
-    // std::vector<std::variant<double,
-    // std::string,
-    // std::monostate>>
->;
+    CNull,
+    BuiltinFuncPtr,
+    CArray
+> {
+    using variant::variant;
+};

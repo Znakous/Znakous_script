@@ -20,7 +20,9 @@ enum class TokenType {
     ident,
     for_s, while_s, in_s,
     assign, endif, comma, endfunc,
-    stdfunc, endwhile
+    stdfunc, endwhile,
+    lsquare, rsquare,
+    array_access
 };
 
 
@@ -66,6 +68,8 @@ constexpr std::pair<std::string_view, Token> keywords[] = {
     {"<=", {TokenType::leq, std::nullopt}},
     {">=", {TokenType::geq, std::nullopt}},
     {",", {TokenType::comma, std::nullopt}},
+    {"[", {TokenType::lsquare, std::nullopt}},
+    {"]", {TokenType::rsquare, std::nullopt}},
     {"true", {TokenType::intliteral, "1"}},
     {"false", {TokenType::intliteral, "0"}},
 };

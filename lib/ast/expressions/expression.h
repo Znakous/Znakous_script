@@ -76,7 +76,8 @@ struct ExpressionImpl<1> { // for prefix operations only
 template<>
 struct ExpressionImpl<0> {
     std::variant<ptr<FunctionCallExpression>, ptr<StringLiteralExpression>,
-    ptr<IntLiteralExpression>, ptr<IdentifierExpression>, ptr<ScopedExpression>
+    ptr<IntLiteralExpression>, ptr<IdentifierExpression>, ptr<ScopedExpression>,
+    ptr<ArrayExpression>, ptr<ArrayAccessExpression>
     > value;
 };
 
@@ -86,5 +87,15 @@ struct FunctionalExpression {
     std::vector<Statement> body;
     std::vector<std::string_view> arguments;
     ptr<Environment> closure_env;
+};
+
+
+struct ArrayExpression {
+    std::vector<Expression> elements;
+};
+
+struct ArrayAccessExpression {
+    std::string_view array;
+    Expression index;
 };
 

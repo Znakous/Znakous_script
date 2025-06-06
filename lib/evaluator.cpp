@@ -19,6 +19,7 @@ Stopping Evaluator::operator()(ptr<Statement>& statement) {
     // return ret;
 }
 Stopping Evaluator::operator()(ptr<IfStatement>& expr) {
+    std::cout << "eval if statement\n";
     auto eval_res = std::visit(*this, expr->condition);
     if (std::visit(TruthChecker{}, eval_res)) {
         env_.Enclose();
@@ -66,6 +67,7 @@ Stopping Evaluator::operator()(ptr<ReturnStatement>& ret_st) {
 }
 
 Stopping Evaluator::operator()(ptr<ExprStatement>& expr) {
+    std::cout << "eval expr statement\n";
     std::visit(*this, expr->expr);
     return Stopping::none;
 }
@@ -97,6 +99,7 @@ Object Evaluator::operator()(ptr<StringLiteralExpression>& expr) {
 }
 
 Object Evaluator::ExecStd(ptr<FunctionCallExpression>& expr) {
+    std::cout << "exec std\n";
     if (expr->function == "print") {
         return std::visit(Print{out_}, std::visit(*this, expr->arguments[0]));
     }
@@ -160,3 +163,38 @@ Object Evaluator::operator()(ptr<ScopedExpression>& expr) {
 //         return 
 //     }
 // }
+
+Object Evaluator::operator()(ptr<ArrayExpression>& expr) {
+    CArray array;
+    std::cout << "array decl eval\n";
+    for (auto& element : expr->elements) {
+        array.arr.push_back(std::visit(*this, element));
+    }
+    return array;
+}
+
+Object Evaluator::operator()(ptr<ArrayAccessExpression>& expr) {
+    std::cout << "array access eval\n";
+    auto arr = (env_[expr->array]);
+    // Object index_obj = std::visit(*this, expr->index);
+    
+    CArray& array = std::get<CArray>(arr);
+    Object index_obj = std::visit(*this, expr->index);
+    size_t idx = std::get<double>(index_obj);
+    if (idx < array.arr.size()) {
+        return array.arr[idx];
+    }
+    throw std::runtime_error("Array index out of bounds");
+
+    // if (auto array = std::get_if<CArray>(&array_obj)) {
+    //     if (auto index = std::get_if<double>(&index_obj)) {
+    //         size_t idx = static_cast<size_t>(*index);
+    //         if (idx < array->arr.size()) {
+    //             return array->arr[idx];
+    //         }
+    //         throw std::runtime_error("Array index out of bounds");
+    //     }
+    //     throw std::runtime_error("Array index must be a number");
+    // }
+    // throw std::runtime_error("Cannot index a non-array object");
+}

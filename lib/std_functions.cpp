@@ -14,6 +14,9 @@ bool TruthChecker::operator()(CNull) {
 bool TruthChecker::operator()(BuiltinFuncPtr) {
     return true;
 }
+bool TruthChecker::operator()(CArray a) {
+    return !a.arr.empty();
+}
 
 
 bool IsStdFunc(std::string_view s) {

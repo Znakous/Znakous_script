@@ -16,16 +16,6 @@
 
 double stoi_view(std::string_view);
 
-// struct ExprVisitor{
-//     ~ExprVisitor() = default;
-//     Object visit(IntLiteralExpression& expr) {
-
-//     }
-//     Object visit(StringLiteralExpression& expr) = 0;
-//     Object visit(IdentifierExpression& expr) = 0;
-//     Object visit(PrefixExpression& expr) = 0;
-// };
-
 enum class Stopping {
     return_s, break_s, continue_s, none
 };
@@ -79,11 +69,9 @@ struct Evaluator {
     Object operator()(ptr<FunctionCallExpression>& expr);
     Object operator()(ptr<IdentifierExpression>& expr);
     Object operator()(ptr<ScopedExpression>& expr);
-    // Object visit(PrefixExpression& expr) {
-    //     if (expr.prefix_oper == TokenType::minus) {
-    //         return 
-    //     }
-    // }
+    Object operator()(ptr<ArrayExpression>& expr);
+    Object operator()(ptr<ArrayAccessExpression>& expr);
+
 private:
     Object ExecStd(ptr<FunctionCallExpression>& expr);
     std::optional<Object> return_object_;

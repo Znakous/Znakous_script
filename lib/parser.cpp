@@ -136,23 +136,23 @@ ptr<IfStatement> Parser::ParseIfStatement() {
     if_statement->condition = ParseExpression();
     std::cout << "                parsed cond\n";
     if (cur_token_.type != TokenType::then) {
-        // missing then
+        std::cout << "missing then\n";
     } else {
         AdvanceTokens();
-        if_statement->to_do = ParseStatement();
-        std::cout << (int) cur_token_.type << " ttttt\n";
-        while(true) {
-            auto else_if = ParseElseIfs();
-            if (else_if.has_value()) {
-                if_statement->else_ifs.push_back(else_if.value());
-            } else {
-                break;
-            }
-        }
-        std::cout << "go parse else <---------------\n";
-        std::cout << (int) cur_token_.type << " kkkkkk\n";
-        if_statement->else_s = ParseElseStatement();
     }
+    if_statement->to_do = ParseStatement();
+    std::cout << (int) cur_token_.type << " ttttt\n";
+    while(true) {
+        auto else_if = ParseElseIfs();
+        if (else_if.has_value()) {
+            if_statement->else_ifs.push_back(else_if.value());
+        } else {
+            break;
+        }
+    }
+    std::cout << "go parse else <---------------\n";
+    std::cout << (int) cur_token_.type << " kkkkkk\n";
+    if_statement->else_s = ParseElseStatement();
     AdvanceTokens();
     return if_statement;
 }
