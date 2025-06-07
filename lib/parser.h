@@ -3,9 +3,10 @@
 #include "usings.h"
 #include "lexer.h"
 #include "ast/ast.h"
+#include "logger.h"
 
 struct Parser {
-    Parser(const char* data);
+    Parser(const char* data, std::shared_ptr<logging::Logger> log);
     void AdvanceTokens();
     Statement ParseStatement();
     
@@ -20,76 +21,62 @@ struct Parser {
 
     template<size_t Level>
     ptr<ExpressionImpl<Level>> ParseLeveledExpression() {
-        std::cout << "parsing leveled " << Level << "\n";
+        logger_->log("Parsing expression at level ", Level);
 
         ptr<ExpressionImpl<Level>> expr = make_ptr<ExpressionImpl<Level>>();
         expr->first = ParseLeveledExpression<Level-1>();
-        while(true) {
-            if (IsLevelOperator<Level>(cur_token_)) {
-                auto oper = cur_token_;
-                AdvanceTokens();
-                expr->others.emplace_back(oper, ParseLeveledExpression<Level-1>());
-            } else {
-                break;
-            }
+        while(IsLevelOperator<Level>(cur_token_)) {
+            auto oper = cur_token_;
+            AdvanceTokens();
+            auto rhs = ParseLeveledExpression<Level-1>();
+            expr->others.emplace_back(Operator<Level>{oper}, rhs);
         }
         return expr;
     }
 
-
     template<>
     ptr<ExpressionImpl<1>> ParseLeveledExpression() {
-        std::cout << "parsing leveled " << 1 << "\n";
+        logger_->log("Parsing expression at level 1");
 
         ptr<ExpressionImpl<1>> ans = make_ptr<ExpressionImpl<1>>();
         if (IsPrefixOperator(cur_token_.type)) {
-            std::cout << "ddddf is that\n";
+            logger_->log("Found prefix operator");
             ans->prefix_oper = cur_token_;
             AdvanceTokens();
             ans->underlying = ParseLeveledExpression<0>();
-            return ans;
-        }
-        else {
+        } else {
             ans->prefix_oper = std::nullopt;
-            // AdvanceTokens();
             ans->underlying = ParseLeveledExpression<0>();
-            return ans;
         }
+        return ans;
     }
+
     template<>
     ptr<ExpressionImpl<0>> ParseLeveledExpression() {
-        std::cout << "parsing level 0\n"; 
-        std::cout << "token " << (int) cur_token_.type << "\n";
+        logger_->log("Parsing expression at level 0, token type: ", static_cast<int>(cur_token_.type));
+
         ptr<ExpressionImpl<0>> ans = make_ptr<ExpressionImpl<0>>();
         if (cur_token_.type == TokenType::lparen) {
-            std::cout << "lparen seen\n"; 
+            logger_->log("Parsing parenthesized expression");
             AdvanceTokens();
-            ptr<ScopedExpression> scoped 
-                = make_ptr<ScopedExpression>();
+            ptr<ScopedExpression> scoped = make_ptr<ScopedExpression>();
             scoped->underlying = ParseExpression();            
             AdvanceTokens();
-            // AdvanceTokens();
             ans->value = scoped;
-            // Expect that skiped ')'
-            // return ans;
         } else if (cur_token_.type == TokenType::intliteral) {
-            std::cout << "it's number!!\n";
+            logger_->log("Parsing integer literal: ", cur_token_.value.value());
             auto lit = make_ptr<IntLiteralExpression>();
             lit->literal = cur_token_;
-            std::cout << "number is " << lit->literal.value.value() << " " << lit->literal.value.value().size() << "\n";
             AdvanceTokens();
             ans->value = lit;
-            // return ans;
         } else if (cur_token_.type == TokenType::stringliteral) {
-            std::cout << "string literal\n";
+            logger_->log("Parsing string literal");
             auto lit = make_ptr<StringLiteralExpression>();
             lit->literal = cur_token_;
             AdvanceTokens();
             ans->value = lit;
-            // return ans;
-        }else if (cur_token_.type == TokenType::lsquare) {
-            // Parse array literal
-            std::cout << "array literal\n";
+        } else if (cur_token_.type == TokenType::lsquare) {
+            logger_->log("Parsing array literal");
             ptr<ArrayExpression> array = make_ptr<ArrayExpression>();
             AdvanceTokens(); // skip [
             
@@ -102,7 +89,7 @@ struct Parser {
             AdvanceTokens(); // skip ]
             ans->value = array;
         } else if (cur_token_.type == TokenType::ident && peek_token_.type == TokenType::lsquare) {
-            std::cout << "array access parse\n";
+            logger_->log("Parsing array access");
             auto access = make_ptr<ArrayAccessExpression>();
             access->array = cur_token_.value.value();
             AdvanceTokens(); // skip name
@@ -113,33 +100,21 @@ struct Parser {
                 AdvanceTokens(); // skip ]
             }
             ans->value = access;
-        }
-        else if ((cur_token_.type == TokenType::ident || cur_token_.type == TokenType::stdfunc) && peek_token_.type == TokenType::lparen) {
-            std::cout << "i make func call\n";
+        } else if ((cur_token_.type == TokenType::ident || cur_token_.type == TokenType::stdfunc) && peek_token_.type == TokenType::lparen) {
+            logger_->log("Parsing function call");
             auto call = make_ptr<FunctionCallExpression>();
             call->function = cur_token_.value.value();
             call->token = cur_token_;
             AdvanceTokens();
             call->arguments = ParseArguments();
-            // while (cur_token_.type != TokenType::rparen) {
-            //     call->arguments.push_back(ParseExpression());
-            //     // if (cur_token_.type == TokenType::comma) AdvanceTokens();
-            // }
-            // AdvanceTokens();
             ans->value = call;
-            std::cout << "i parsedfunc call\n";
-            // return ans;
-        } 
-        else if (cur_token_.type == TokenType::ident) {
-            std::cout << "it's ident\n";
+        } else if (cur_token_.type == TokenType::ident) {
+            logger_->log("Parsing identifier: ", cur_token_.value.value());
             auto ident = make_ptr<IdentifierExpression>();
             ident->name = cur_token_.value.value();
             AdvanceTokens();
             ans->value = ident;
-            // return ans;
         }
-        std::cout << "wdf is that\n";
-        std::cout << (int) cur_token_.type;
         return ans;
     }
 
@@ -149,9 +124,9 @@ struct Parser {
     std::optional<ptr<ElseIfStatement>> ParseElseIfs();
     std::optional<ptr<ElseStatement>> ParseElseStatement();
 private:
-
     std::vector<Expression> ParseArguments();
     Lexer lexer_;
     Token cur_token_;
     Token peek_token_;
+    std::shared_ptr<logging::Logger> logger_;
 };

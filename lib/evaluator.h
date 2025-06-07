@@ -13,6 +13,7 @@
 #include "operators_executor.h"
 #include "object.h"
 #include "ast/ast.h"
+#include "logger.h"
 
 double stoi_view(std::string_view);
 
@@ -21,39 +22,43 @@ enum class Stopping {
 };
 
 struct Evaluator {
-    Evaluator(std::ostream&);
+    Evaluator(std::ostream& out, std::shared_ptr<logging::Logger> log);
+
     template<size_t Level>
     Object operator()(ptr<ExpressionImpl<Level>>& expr) {
-        std::cout << "eval expr impl\n";
+        logger_->log("Evaluating expression at level " + std::to_string(Level));
         Object result = (*this)(expr->first);
+        logger_->log("First operand evaluated");
+        
         for(auto op_and_expr : expr->others) {
-            std::cout << "in for\n";
+            logger_->log("Processing operator: " + std::to_string((int)op_and_expr.first.token.type));
             Object from_rhs = (*this)(op_and_expr.second);
-            std::cout << "taken\n";
-            result = exec_bin_.Execute(op_and_expr.first.token.type, result, from_rhs);
+            Object lhs = result;
+            Object rhs = from_rhs;
+            result = exec_bin_.Execute(op_and_expr.first.token.type, lhs, rhs);
+            logger_->log("Operation completed");
         }
-        std::cout << "eval expr impl ret\n";
         return result;
     }
 
     template<>
     Object operator()(ptr<ExpressionImpl<1>>& expr) {
-        std::cout << "lev 1\n";
+        logger_->log("Evaluating level 1 expression");
         Object result = (*this)(expr->underlying);
+        
         if (expr->prefix_oper) {
-            std::cout << "pref_ex\n";
-            return exec_un_.Execute(expr->prefix_oper.value().type, result);
+            logger_->log("Applying prefix operator: " + std::to_string((int)expr->prefix_oper.value().type));
+            Object operand = result;
+            result = exec_un_.Execute(expr->prefix_oper.value().type, operand);
         }
-        std::cout << "lev 1 ret\n";
         return result;
     }
+
     template<>
     Object operator()(ptr<ExpressionImpl<0>>& expr) {
-        std::cout << "lev 0\n";
-
+        logger_->log("Evaluating level 0 expression");
         return std::visit(*this, expr->value);
     }
-
 
     Stopping operator()(ptr<Statement>& expr);
     Stopping operator()(ptr<IfStatement>& expr);
@@ -63,17 +68,16 @@ struct Evaluator {
     Stopping operator()(ptr<ExprStatement>& expr);
     Stopping operator()(ptr<ArrayAssignStatement>& expr);
     Stopping operator()(ptr<BreakStatement>&) { 
-        std::cout << "Evaluating break statement\n";
+        logger_->log("Evaluating break statement");
         return Stopping::break_s; 
     }
     Stopping operator()(ptr<ContinueStatement>&) { 
-        std::cout << "Evaluating continue statement\n";
+        logger_->log("Evaluating continue statement");
         return Stopping::continue_s; 
     }
 
     Object operator()(ptr<IntLiteralExpression>& expr);
     Object operator()(ptr<StringLiteralExpression>& expr);
-
     Object operator()(ptr<FunctionalExpression>& expr);
     Object operator()(ptr<FunctionCallExpression>& expr);
     Object operator()(ptr<IdentifierExpression>& expr);
@@ -89,4 +93,5 @@ private:
     EnvironmentMaster env_;
     BinaryOperatorExecutor exec_bin_;
     UnaryOperatorExecutor exec_un_;
+    std::shared_ptr<logging::Logger> logger_;
 };

@@ -40,7 +40,7 @@ public:
         Node *r = root;
         for(const auto& c : word){
             // std::cout << "on symbol " << c << "\n";
-            std::cout << "insert on symbol " << c << "\n";
+            // std::cout << "insert on symbol " << c << "\n";
 
             int i = c;
             
@@ -52,7 +52,7 @@ public:
                 r = r->to[i];
             }
         }
-        std::cout << "pushing\n";
+        // std::cout << "pushing\n";
         r->cbe = ending;
     }
     void erase(std::string_view word) {
@@ -75,12 +75,12 @@ public:
         uint32_t i = 0;
         for(;; ++i){ // will eventually break
             char l = word[i];
-            std::cout << "get on symbol " << l << " ind " << i << "\n";
+            // std::cout << "get on symbol " << l << " ind " << i << "\n";
             if (!r->count_in_subtree || l == '\0') {
                 break;
             }
             if (r->cbe) {
-                std::cout << "found smth\n";
+                // // std::cout << "found smth\n";
                 cur = (r->cbe);
                 cur_size = i;
             }
@@ -91,7 +91,7 @@ public:
             }
         }
         if (r->cbe) {
-            std::cout << "found smth\n";
+            // std::cout << "found smth\n";
             cur = (r->cbe);
             cur_size = i;
         }
@@ -107,12 +107,12 @@ public:
         uint32_t i = 0;
         for(;; ++i){ // will eventually break
             char l = word[i];
-            std::cout << "get on symbol " << l << " ind " << i << "\n";
+            // std::cout << "get on symbol " << l << " ind " << i << "\n";
             if (!r->count_in_subtree || l == '\0') {
                 break;
             }
             if (r->cbe) {
-                std::cout << "found smth\n";
+                // std::cout << "found smth\n";
                 cur = &(r->cbe.value());
                 cur_size = i;
             }
@@ -123,14 +123,14 @@ public:
             }
         }
         if (r->cbe) {
-            std::cout << "found smth\n";
+            // std::cout << "found smth\n";
             cur = &(r->cbe.value());
             cur_size = i;
         }
         if (cur){
             return *cur;
         } else {
-            std::cout << "unresolved\n";
+            // std::cout << "unresolved\n";
         }
         // pupupu
     }

@@ -16,12 +16,12 @@ bool IsLevelOperator<1>(Token token) {
 
 template<>
 bool IsLevelOperator<2>(Token token) {
-    return (token.type == TokenType::plus) || (token.type == TokenType::minus);
+    return (token.type == TokenType::multiply) || (token.type == TokenType::divide);
 }
 
 template<>
 bool IsLevelOperator<3>(Token token) {
-    return (token.type == TokenType::multiply) || (token.type == TokenType::divide);
+    return (token.type == TokenType::plus) || (token.type == TokenType::minus);
 }
 
 // constexpr bool allowed_in_identifier[255];

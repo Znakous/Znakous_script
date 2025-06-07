@@ -1,77 +1,79 @@
 #include "parser.h"
 
-Parser::Parser(const char* data) 
-    : lexer_(data)
+Parser::Parser(const char* data, std::shared_ptr<logging::Logger> log) 
+    : lexer_(data, log), logger_(log)
 {    
     cur_token_ = lexer_.GetToken();
     peek_token_ = lexer_.GetToken();
-    std::cout << "init cur and peek\n";
-    std::cout << (int)cur_token_.type << " " << (int)peek_token_.type << "\n";
-    // initialize cur and peek tokens
+    logger_->log("Parser initialized with tokens: ", static_cast<int>(cur_token_.type), 
+                 " and ", static_cast<int>(peek_token_.type));
 }
+
 void Parser::AdvanceTokens() {
-    std::cout << "before advance\n";
-    std::cout << (int)cur_token_.type << " " << (int)peek_token_.type << "\n";
+    logger_->log("Advancing tokens from: ", static_cast<int>(cur_token_.type), 
+                 " and ", static_cast<int>(peek_token_.type));
     cur_token_ = peek_token_;
     peek_token_ = lexer_.GetToken();
-    std::cout << "after advance\n";
-    std::cout << (int)cur_token_.type << " " << (int)peek_token_.type << "\n";
+    logger_->log("Advanced to: ", static_cast<int>(cur_token_.type), 
+                 " and ", static_cast<int>(peek_token_.type));
 }
+
 Statement Parser::ParseStatement() {
-    std::cout << "parsing statement\n";
-    std::cout << (int) cur_token_.type << " type\n";
-    std::cout << (int) peek_token_.type << " peek type\n";
+    logger_->log("Parsing statement, current token: ", static_cast<int>(cur_token_.type),
+                 ", peek token: ", static_cast<int>(peek_token_.type));
+
     if (cur_token_.type != TokenType::invalid) {
         if (cur_token_.type == TokenType::if_s) {
-            std::cout << "---------- its if\n";
+            logger_->log("Found if statement");
             return ParseIfStatement();
         } else if (cur_token_.type == TokenType::ret) {
+            logger_->log("Found return statement");
             return ParseReturnStatement();
         } else if (cur_token_.type == TokenType::while_s) {
+            logger_->log("Found while statement");
             return ParseWhileStatement();
         } else if (cur_token_.type == TokenType::break_s) {
-            std::cout << "Found break statement\n";
+            logger_->log("Found break statement");
             AdvanceTokens();
-            auto stmt = make_ptr<BreakStatement>();
-            std::cout << "Created break statement\n";
-            return stmt;
+            return make_ptr<BreakStatement>();
         } else if (cur_token_.type == TokenType::continue_s) {
-            std::cout << "Found continue statement\n";
+            logger_->log("Found continue statement");
             AdvanceTokens();
-            auto stmt = make_ptr<ContinueStatement>();
-            std::cout << "Created continue statement\n";
-            return stmt;
+            return make_ptr<ContinueStatement>();
         } else {
             return ParseAssignStatement();
         }
-    } else {
-        std::cout << "invalid statement\n";
-        // pupupu, wrong statement
     }
-    std::cout << "wrong parsed statement\n";
+    
+    logger_->log("Invalid statement encountered");
 }
 
 Statement Parser::ParseAssignStatement() {
-    std::cout << "parse assign\n";
+    logger_->log("Attempting to parse assignment");
+
     if (cur_token_.type != TokenType::ident) {
-        std::cout << "not ident\n";
+        logger_->log("Not an identifier, parsing as expression statement");
         return ParseExprStatement();
     }
     if (peek_token_.type != TokenType::assign && peek_token_.type != TokenType::lsquare) {
-        std::cout << "not assign\n";
+        logger_->log("Not an assignment or array access, parsing as expression statement");
         return ParseExprStatement();
     }
+
     std::string_view ident = cur_token_.value.value();
-    std::cout << "ident\n";
+    logger_->log("Processing identifier: ", ident);
     AdvanceTokens();
+
     if (!(cur_token_.type == TokenType::lsquare)) {
+        logger_->log("Parsing simple assignment");
         ptr<AssignStatement> ans = make_ptr<AssignStatement>();
         ans->ident = ident;
         AdvanceTokens();
         ans->expr = ParseExpression();
         return ans;
     }
-    std::cout << "lsquare\n";
+
+    logger_->log("Parsing array assignment");
     ptr<ArrayAssignStatement> ans = make_ptr<ArrayAssignStatement>();
     ans->array = ident;
     while (cur_token_.type == TokenType::lsquare) {
@@ -85,92 +87,102 @@ Statement Parser::ParseAssignStatement() {
 }
 
 ptr<Program> Parser::ParseProgram() {
-    std::cout << "parsing program\n";
+    logger_->log("Starting program parsing");
     ptr<Program> ans = make_ptr<Program>();
+    
     while (cur_token_.type != TokenType::invalid) {
-        std::cout << "parse stmt\n";
+        logger_->log("Parsing next statement");
         ans->statements.emplace_back(ParseStatement());
-        std::cout << "parsed stmt\n";
-        std::cout << "after parse " << (int) cur_token_.type << "\n";
-        
+        logger_->log("Statement parsed, current token: ", static_cast<int>(cur_token_.type));
     }
+    
+    logger_->log("Program parsing completed");
     return ans;
 }
 
 Expression Parser::ParseExpression() {
-    std::cout << "parsing expression\n";
-    // Expression expr = make_ptr<Expression>();
+    logger_->log("Parsing expression");
+
     if (cur_token_.type == TokenType::func) {
-        std::cout << "i met func\n";
+        logger_->log("Parsing function definition");
         AdvanceTokens(); // skip func
-        // AdvanceTokens(); // skip lparen
+
         ptr<FunctionalExpression> ans = make_ptr<FunctionalExpression>();
-        std::cout << "parse args\n";
+        logger_->log("Parsing function arguments");
+
         while (cur_token_.type != TokenType::rparen) {
-            std::cout << "arg next\n";
             AdvanceTokens();
-            std::cout << "arg\n";
+            logger_->log("Parsing argument: ", cur_token_.value.value());
             ans->arguments.push_back(cur_token_.value.value());
             AdvanceTokens();
         }
-        std::cout << "go advance ret\n";
+
         AdvanceTokens();
-        std::cout << "go parse ret\n";
+        logger_->log("Parsing function body");
+
         while (cur_token_.type != TokenType::endfunc) {
             ans->body.push_back(ParseStatement());
         }
-        // ans = ParseReturnStatement();
-        std::cout << "i parsed func\n";
+
         AdvanceTokens();
+        logger_->log("Function parsing completed");
         return ans;
     } else {
         return ParseLeveledExpression<operators_levels>();
     }
-    // return expr;
 }
 
 ptr<ExprStatement> Parser::ParseExprStatement() {
+    logger_->log("Parsing expression statement");
     ptr<ExprStatement> ans = make_ptr<ExprStatement>();
     ans->expr = ParseExpression();
     return ans;
 }
 
 ptr<WhileStatement> Parser::ParseWhileStatement() {
+    logger_->log("Parsing while statement");
     ptr<WhileStatement> ans = make_ptr<WhileStatement>();
     AdvanceTokens();
+    
+    logger_->log("Parsing while condition");
     ans->condition = ParseExpression();
+    
+    logger_->log("Parsing while body");
     while (cur_token_.type != TokenType::endwhile) {
         ans->body.push_back(ParseStatement());
-        std::cout << "parsed stmt in while\n";
     }
+    
     AdvanceTokens();
+    logger_->log("While statement parsing completed");
     return ans;
 }
 
 ptr<ReturnStatement> Parser::ParseReturnStatement() {
+    logger_->log("Parsing return statement");
     ptr<ReturnStatement> ans = make_ptr<ReturnStatement>();
     AdvanceTokens();
     ans->value = ParseExpression();
-    std::cout << "parse ret\n";
     return ans;
 }
 
 ptr<IfStatement> Parser::ParseIfStatement() {
+    logger_->log("Parsing if statement");
     ptr<IfStatement> if_statement = make_ptr<IfStatement>();
-    std::cout << "boom if......\n";
-    std::cout << (int) cur_token_.type << " pppppp\n";
+    
     AdvanceTokens();
-    std::cout << (int) cur_token_.type << " pppppp\n";
-    std::cout << "boom if2......\n";
+    logger_->log("Parsing if condition");
     if_statement->condition = ParseExpression();
-    std::cout << "                parsed cond\n";
+    
     if (cur_token_.type != TokenType::then) {
-        std::cout << "missing then\n";
+        logger_->log("Error: missing 'then' keyword");
     } else {
         AdvanceTokens();
     }
+    
+    logger_->log("Parsing if body");
     if_statement->to_do = ParseStatement();
-    std::cout << (int) cur_token_.type << " ttttt\n";
+    
+    logger_->log("Parsing else-if clauses");
     while(true) {
         auto else_if = ParseElseIfs();
         if (else_if.has_value()) {
@@ -179,25 +191,27 @@ ptr<IfStatement> Parser::ParseIfStatement() {
             break;
         }
     }
-    std::cout << "go parse else <---------------\n";
-    std::cout << (int) cur_token_.type << " kkkkkk\n";
+    
+    logger_->log("Parsing else clause");
     if_statement->else_s = ParseElseStatement();
     AdvanceTokens();
+    
+    logger_->log("If statement parsing completed");
     return if_statement;
 }
+
 std::optional<ptr<ElseIfStatement>> Parser::ParseElseIfs() {
     if (cur_token_.type == TokenType::elif_s) {
-        std::cout << "aaaaaaaaaaaaaaaaaaaaaa\n";
-        // maybe put in field
+        logger_->log("Parsing else-if clause");
         AdvanceTokens();
         ptr<ElseIfStatement> ans = make_ptr<ElseIfStatement>();
         ans->condition = ParseExpression();
         ans->underlying = ParseStatement();
         return ans;
-    } else {
-        return std::nullopt;
     }
+    return std::nullopt;
 }
+
 std::optional<ptr<ElseStatement>> Parser::ParseElseStatement() {
     if (cur_token_.type != TokenType::else_s) {
         return std::nullopt;
@@ -211,16 +225,19 @@ std::optional<ptr<ElseStatement>> Parser::ParseElseStatement() {
 }
 
 std::vector<Expression> Parser::ParseArguments() {
-    std::cout << "parse args 2\n";
-    std::vector<Expression> ans;
-    // AdvanceTokens(); // skip (
-    while(cur_token_.type != TokenType::rparen) {
-        std::cout << "arg 2\n";
-        AdvanceTokens();
-        ans.push_back(ParseExpression());
-        // AdvanceTokens(); // check 
+    logger_->log("Parsing function arguments");
+    std::vector<Expression> arguments;
+    AdvanceTokens(); // skip (
+    
+    while (cur_token_.type != TokenType::rparen) {
+        logger_->log("Parsing next argument");
+        arguments.push_back(ParseExpression());
+        if (cur_token_.type == TokenType::comma) {
+            AdvanceTokens();
+        }
     }
-    std::cout << "skip )\n";
+    
     AdvanceTokens(); // skip )
-    return ans;
+    logger_->log("Arguments parsing completed");
+    return arguments;
 }

@@ -30,6 +30,7 @@ add_executable(
   inerpreter_tests/cycles_tests.cpp
   inerpreter_tests/arrays_tests.cpp
   inerpreter_tests/weirdos_tests.cpp
+  inerpreter_tests/strings_tests.cpp
   # inerpreter_tests/interpreter_tests.cpp
 )
 

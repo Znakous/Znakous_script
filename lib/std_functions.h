@@ -6,7 +6,7 @@
 struct Printer {
     template<typename T>
     void operator()(T a) {
-        std::cout << "print called\n";
+        // std::cout << "print called\n";
         out << a;
     }
     void operator()(CArray a) {

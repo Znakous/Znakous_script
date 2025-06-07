@@ -50,7 +50,7 @@ struct Environment {
     }
 
     Object& operator[](std::string_view ident) {
-        std::cout << "resolving ident " << ident << "\n";
+        // std::cout << "resolving ident " << ident << "\n";
         auto resp = namespc_->get(ident.data());
         if (!resp.has_value() || resp.value().size != ident.size()) {
             if (parent_) {
@@ -69,9 +69,9 @@ struct Environment {
     }
 
     void Declare(std::string_view ident) {
-        std::cout << "declaring   " << ident << "\n";
+        // std::cout << "declaring   " << ident << "\n";
         if (!namespc_->get(ident.data())){
-            std::cout << "unk\n";
+            // std::cout << "unk\n";
             namespc_->insert(ident, CNull());
         }
     }
@@ -92,7 +92,7 @@ struct EnvironmentMaster {
     {}
 
     void Enclose(Environment* closure_env = nullptr) {
-        std::cout << "enclose !!!!!!!!!!!!!!!\n";
+        // std::cout << "enclose !!!!!!!!!!!!!!!\n";
         Environment* parent = closure_env ? closure_env : current;
         Environment* new_one = new Environment(parent);
         current = new_one;
@@ -103,7 +103,7 @@ struct EnvironmentMaster {
     }
 
     void OutClose() {
-        std::cout << "outclose !!!!!!!!!!!!!!!1\n";
+        //  std::cout << "outclose !!!!!!!!!!!!!!!1\n";
         Environment* parent = current->GetParent();
         delete current;
         current = parent;
@@ -113,7 +113,7 @@ struct EnvironmentMaster {
         return current->GetByIdent(ident);
     }
     Object& operator[](std::string_view ident) {
-        std::cout << "[[[[]]]] " << ident << "\n";
+        // std::cout << "[[[[]]]] " << ident << "\n";
         return (*current)[ident];
     }
     void Declare(std::string_view ident) {

@@ -13,15 +13,16 @@ double stoi_view(std::string_view s) {
 }
 
 
-Evaluator::Evaluator(std::ostream& out) : out_(out) {}
+Evaluator::Evaluator(std::ostream& out, std::shared_ptr<logging::Logger> log)
+ : out_(out), logger_(log), exec_bin_(log), exec_un_(log) 
+{}
 
 Stopping Evaluator::operator()(ptr<Statement>& statement) {
-    std::cout << "statemnet\n";
+    logger_->log("Evaluating statement");
     return std::visit(*this, *statement);
-    // return ret;
 }
 Stopping Evaluator::operator()(ptr<IfStatement>& expr) {
-    std::cout << "eval if statement\n";
+    logger_->log("Evaluating if statement");
     auto eval_res = std::visit(*this, expr->condition);
     if (std::visit(TruthChecker{}, eval_res)) {
         env_.Enclose();
@@ -39,22 +40,17 @@ Stopping Evaluator::operator()(ptr<IfStatement>& expr) {
         return std::visit(*this, expr->else_s.value()->underlying);
     }
     return Stopping::none;
-    // return ret;
 }
 Stopping Evaluator::operator()(ptr<AssignStatement>& expr) {
-    std::cout << "we assign!!!!!!!\n";
+    logger_->log("Processing assignment");
     env_.Declare(expr->ident);
-    std::cout << "declared\n";
     auto rhs = std::visit(*this, expr->expr);
-    std::cout << "got rhs\n";
-    std::cout << "ident: " << expr->ident << "\n";
-    std::cout << typeid(rhs).name();
+    logger_->log("Assigning to identifier: ", expr->ident);
     env_[expr->ident] = rhs;
-    std::cout << "we assigned\n";
     return Stopping::none;
 }
 Stopping Evaluator::operator()(ptr<ReturnStatement>& ret_st) {
-    std::cout << "ret state\n";
+    logger_->log("Processing return statement");
     return_object_ = std::visit(*this, ret_st->value);
     if (auto func = std::get_if<ptr<FunctionalExpression>>(&return_object_.value())) {
         if (!(*func)->closure_env) {
@@ -62,22 +58,18 @@ Stopping Evaluator::operator()(ptr<ReturnStatement>& ret_st) {
         }
     }
     return Stopping::return_s;
-    // auto ret = make_ptr<Object>();
-    // *ret = std::string("aaaaaa");
-    // return ret;
-    // return ret;
 }
 
 Stopping Evaluator::operator()(ptr<ExprStatement>& expr) {
-    std::cout << "eval expr statement\n";
+    logger_->log("Evaluating expression statement");
     std::visit(*this, expr->expr);
     return Stopping::none;
 }
 
 Stopping Evaluator::operator()(ptr<WhileStatement>& expr) {
-    std::cout << "while statement\n";
+    logger_->log("Processing while statement");
     while (std::visit(TruthChecker{}, std::visit(*this, expr->condition))) {
-        std::cout << "while body\n";
+        logger_->log("Executing while body");
         for (decltype(auto) el : expr->body) {
             auto stop_res = std::visit(*this, el);
             if (stop_res == Stopping::break_s) {
@@ -92,16 +84,16 @@ Stopping Evaluator::operator()(ptr<WhileStatement>& expr) {
     return Stopping::none;
 }
 Object Evaluator::operator()(ptr<IntLiteralExpression>& expr) {
-    std::cout << "int literal\n";
+    logger_->log("Evaluating integer literal");
     return stoi_view(expr->literal.value.value());
 }
 Object Evaluator::operator()(ptr<StringLiteralExpression>& expr) {
-    std::cout << "string literal\n";
+    logger_->log("Evaluating string literal");
     return std::string(expr->literal.value.value());
 }
 
 Object Evaluator::ExecStd(ptr<FunctionCallExpression>& expr) {
-    std::cout << "exec std\n";
+    logger_->log("Executing standard function");
     if (expr->function == "print") {
         return std::visit(Print{out_}, std::visit(*this, expr->arguments[0]));
     }
@@ -110,15 +102,11 @@ Object Evaluator::operator()(ptr<FunctionCallExpression>& expr) {
     if (expr->token.type == TokenType::stdfunc) {
         return ExecStd(expr);
     }
-    std::cout << "func call literal\n";
+    logger_->log("Executing function call: ", expr->function);
     auto function = (env_[expr->function]);
-    std::cout << "hui\n";
 
-    std::cout << function.index() << " <----\n";
-    ptr<FunctionalExpression> to_invoke
-         = std::get<ptr<FunctionalExpression>>
-         (function);
-    std::cout << "know what to invoke\n";
+    ptr<FunctionalExpression> to_invoke = std::get<ptr<FunctionalExpression>>(function);
+    logger_->log("Function resolved, preparing to invoke");
     
     env_.Enclose();
     
@@ -127,7 +115,7 @@ Object Evaluator::operator()(ptr<FunctionCallExpression>& expr) {
     }
     
     for (int i = 0; i < to_invoke->arguments.size(); ++i) {
-        std::cout << "get val for " << to_invoke->arguments[i] << "\n";
+        logger_->log("Processing argument: ", to_invoke->arguments[i]);
         env_.Declare(to_invoke->arguments[i]);
         env_[to_invoke->arguments[i]] = std::visit(*this, expr->arguments[i]);
     }
@@ -135,29 +123,28 @@ Object Evaluator::operator()(ptr<FunctionCallExpression>& expr) {
     for (decltype(auto) st : to_invoke->body) {
         Stopping stop_res = std::visit(*this, st);
         if (stop_res == Stopping::return_s) {
-            std::cout << "      stopped\n";
+            logger_->log("Function returned");
             env_.OutClose();
             return return_object_.value();
         }
     }
     
-    std::cout << "func did't return !!!!!!!!!!!!!!!\n";
+    logger_->log("Function completed without return");
     env_.OutClose();
     return CNull();
 }
 Object Evaluator::operator()(ptr<IdentifierExpression>& expr) {
-    std::cout << "identifier\n";
-    auto ans = env_.GetByIdent(expr->name).value();
-    std::cout << "parsed from ident\n";
-    return ans;
+    logger_->log("Evaluating identifier: ", expr->name);
+    return env_.GetByIdent(expr->name).value();
 }
 
 Object Evaluator::operator()(ptr<FunctionalExpression>& expr) {
+    logger_->log("Creating function closure");
     expr->closure_env = make_ptr<Environment>(*env_.current);
     return expr;
 }
 Object Evaluator::operator()(ptr<ScopedExpression>& expr) {
-    std::cout << "scoped\n";
+    logger_->log("Evaluating scoped expression");
     return std::visit(*this, expr->underlying);
 }
 // Object visit(PrefixExpression& expr) {
@@ -167,8 +154,8 @@ Object Evaluator::operator()(ptr<ScopedExpression>& expr) {
 // }
 
 Object Evaluator::operator()(ptr<ArrayExpression>& expr) {
+    logger_->log("Creating array");
     CArray array;
-    std::cout << "array decl eval\n";
     for (auto& element : expr->elements) {
         array.arr.push_back(std::visit(*this, element));
     }
@@ -203,7 +190,7 @@ std::pair<CArray*, size_t> Evaluator::traverse_array(CArray& root_array, std::ve
 }
 
 Object Evaluator::operator()(ptr<ArrayAccessExpression>& expr) {
-    std::cout << "array access eval\n";
+    logger_->log("Accessing array");
     auto arr = (env_[expr->array]);
     CArray& array = std::get<CArray>(arr);
     
@@ -212,7 +199,7 @@ Object Evaluator::operator()(ptr<ArrayAccessExpression>& expr) {
 }
 
 Stopping Evaluator::operator()(ptr<ArrayAssignStatement>& expr) {
-    std::cout << "array assignment eval\n";
+    logger_->log("Assigning to array");
    
     auto& arr = env_[expr->array];
     CArray& array = std::get<CArray>(arr);

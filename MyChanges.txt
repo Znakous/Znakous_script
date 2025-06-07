@@ -1,9 +1,0 @@
-1. Language recognition doesn't depend on spaces at all -> thus variables' names can't start with language keywords {may be fixed later :) }
-(elseif1<1thenx=t+3endif) // OK
-(if_value = 8 + 9) // still OK
-(value=10
- ifvalue = 0
- if value then) // may cause problems
-(value=10
- if_value = 0
- if value then) // OK

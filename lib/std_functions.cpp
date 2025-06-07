@@ -23,5 +23,6 @@ bool IsStdFunc(std::string_view s) {
     if (s == "print") {
         return true;
     }
+    return false;
 }
 

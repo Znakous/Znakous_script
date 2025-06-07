@@ -7,11 +7,12 @@
 
 #include "token.h"
 #include "trie.h"
+#include "logger.h"
 
 
 class Lexer {
 public:
-    Lexer(const char* data);
+    Lexer(const char* data, std::shared_ptr<logging::Logger> logger);
     bool IsIdentSymbol();
     void ReadOne();
     Token PeekToken();
@@ -31,4 +32,5 @@ private:
     Trie<Token> keywords_;
     Trie<Token> identifiers_;
     Token cur_token_;
+    std::shared_ptr<logging::Logger> logger_;
 };

@@ -8,26 +8,37 @@
 #include "lexer.h"
 #include "parser.h"
 #include "evaluator.h"
+#include "logger.h"
 
 
 
 struct Interpreter{
-    Interpreter(const std::string& data, std::ostream& output) 
-     : parser_(data.data()), output_(output), eval_(output)
-    {std::cout << "constructed\n";}
+    Interpreter(const std::string& data, std::ostream& output, const std::string& log_file = "interpreter.log") 
+     : output_(output),
+       logger_(logging::Logger::create()),
+       eval_(output, logger_),
+       parser_(data.data(), logger_)
+    {
+        #ifdef DEBUG_BUILD
+        logger_->setLogFile(log_file);
+        logger_->log("Debug mode enabled - logging to console and file: ", log_file);
+        logger_->log("Interpreter constructed");
+        #endif
+    }
     ptr<Program> ParseProgram() {
-        std::cout << "interpreter parses program\n";
+        logger_->log("Starting program parsing");
         return parser_.ParseProgram();
     }
     void Evaluate(ptr<Program> prog) {
         for (auto& st : prog->statements) {
-            std::cout << "evaling statement\n";
+            logger_->log("Evaluating statement");
             std::visit(eval_, st);
         }
     }
     
 private:
     std::reference_wrapper<std::ostream> output_;
+    std::shared_ptr<logging::Logger> logger_;
     Evaluator eval_;
     Parser parser_;
     std::string data_;

@@ -6,4 +6,5 @@ add_library(itmoscript
  std_functions.cpp
  preprocess.cpp 
  token.cpp
+ 
 )
