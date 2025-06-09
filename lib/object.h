@@ -6,9 +6,9 @@
 #include <vector>
 #include <ostream>
 #include "ast/expressions/expression_fwd.h"
+#include "std_function_fwd.h"
 
-
-struct CNull{};
+struct CNull {};
 
 inline std::ostream& operator<<(std::ostream& out, CNull) {
     out << "Null";
@@ -16,8 +16,8 @@ inline std::ostream& operator<<(std::ostream& out, CNull) {
 }
 
 using BuiltinFuncPtr = ptr<FunctionalExpression>;
-
 using BuiltinArray = ptr<ArrayExpression>;
+using StdFuncPtr = std::shared_ptr<StdFunc>;
 
 struct Object;
 
@@ -30,7 +30,15 @@ struct Object : std::variant<
     std::string,
     CNull,
     BuiltinFuncPtr,
-    CArray
+    CArray,
+    StdFuncPtr
 > {
-    using variant::variant;
+    using std::variant<
+        double,
+        std::string,
+        CNull,
+        BuiltinFuncPtr,
+        CArray,
+        StdFuncPtr
+    >::variant;
 };

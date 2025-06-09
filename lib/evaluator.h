@@ -84,9 +84,9 @@ struct Evaluator {
     Object operator()(ptr<ScopedExpression>& expr);
     Object operator()(ptr<ArrayExpression>& expr);
     Object operator()(ptr<ArrayAccessExpression>& expr);
-
+    Object operator()(ptr<StdFuncCallExpression>& expr);
 private:
-    Object ExecStd(ptr<FunctionCallExpression>& expr);
+    Object ExecStd(ptr<StdFuncCallExpression>& expr);
     std::pair<CArray*, size_t> traverse_array(CArray& root_array, std::vector<Expression>& indices);
     std::optional<Object> return_object_;
     std::reference_wrapper<std::ostream> out_;

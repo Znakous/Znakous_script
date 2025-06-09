@@ -9,6 +9,15 @@ Parser::Parser(const char* data, std::shared_ptr<logging::Logger> log)
                  " and ", static_cast<int>(peek_token_.type));
 }
 
+Parser::Parser(std::istream& in, std::shared_ptr<logging::Logger> log)
+    : lexer_(in, log), logger_(log)
+{    
+    cur_token_ = lexer_.GetToken();
+    peek_token_ = lexer_.GetToken();
+    logger_->log("Parser initialized with tokens: ", static_cast<int>(cur_token_.type), 
+                 " and ", static_cast<int>(peek_token_.type));
+}
+
 void Parser::AdvanceTokens() {
     logger_->log("Advancing tokens from: ", static_cast<int>(cur_token_.type), 
                  " and ", static_cast<int>(peek_token_.type));
@@ -110,14 +119,20 @@ Expression Parser::ParseExpression() {
         ptr<FunctionalExpression> ans = make_ptr<FunctionalExpression>();
         logger_->log("Parsing function arguments");
 
+        AdvanceTokens(); // skip (
         while (cur_token_.type != TokenType::rparen) {
-            AdvanceTokens();
             logger_->log("Parsing argument: ", cur_token_.value.value());
             ans->arguments.push_back(cur_token_.value.value());
-            AdvanceTokens();
+            AdvanceTokens(); // skip cur_token
+            if (cur_token_.type == TokenType::comma) {
+                AdvanceTokens(); // skip ,
+            }
         }
 
-        AdvanceTokens();
+        if (cur_token_.type == TokenType::rparen) {
+            AdvanceTokens(); // skip )
+        }
+
         logger_->log("Parsing function body");
 
         while (cur_token_.type != TokenType::endfunc) {

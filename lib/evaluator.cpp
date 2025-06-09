@@ -1,5 +1,6 @@
 #include "evaluator.h"
 #include "std_functions.h"
+#include "logger.h"
 
 double stoi_view(std::string_view s) {
     // int ans = 0;
@@ -14,7 +15,7 @@ double stoi_view(std::string_view s) {
 
 
 Evaluator::Evaluator(std::ostream& out, std::shared_ptr<logging::Logger> log)
- : out_(out), logger_(log), exec_bin_(log), exec_un_(log) 
+ : out_(out), logger_(log), exec_bin_(log), exec_un_(log), env_(log)
 {}
 
 Stopping Evaluator::operator()(ptr<Statement>& statement) {
@@ -92,18 +93,22 @@ Object Evaluator::operator()(ptr<StringLiteralExpression>& expr) {
     return std::string(expr->literal.value.value());
 }
 
-Object Evaluator::ExecStd(ptr<FunctionCallExpression>& expr) {
-    logger_->log("Executing standard function");
-    if (expr->function == "print") {
-        return std::visit(Print{out_}, std::visit(*this, expr->arguments[0]));
-    }
+Object Evaluator::operator()(ptr<StdFuncCallExpression>& expr) {
+    std::vector<Object> args;
+    for (auto& arg : expr->arguments) {
+        args.push_back(std::visit(*this, arg));
+    }   
+    auto to_exec = GetStdFunc(expr->function, out_, std::move(args));
+    return std::visit(Executor{}, *to_exec);
 }
 Object Evaluator::operator()(ptr<FunctionCallExpression>& expr) {
-    if (expr->token.type == TokenType::stdfunc) {
-        return ExecStd(expr);
+    logger_->log("Executing function call: ", expr);
+    if (std::holds_alternative<ptr<FunctionCallExpression>>(expr->function->value)) {
+        std::cout << std::get<ptr<FunctionCallExpression>>(expr->function->value);
+        throw std::runtime_error("Function call is smae");
     }
-    logger_->log("Executing function call: ", expr->function);
-    auto function = (env_[expr->function]);
+    auto function = this->operator()(expr->function);
+
 
     ptr<FunctionalExpression> to_invoke = std::get<ptr<FunctionalExpression>>(function);
     logger_->log("Function resolved, preparing to invoke");
@@ -191,7 +196,7 @@ std::pair<CArray*, size_t> Evaluator::traverse_array(CArray& root_array, std::ve
 
 Object Evaluator::operator()(ptr<ArrayAccessExpression>& expr) {
     logger_->log("Accessing array");
-    auto arr = (env_[expr->array]);
+    auto arr = this->operator()(expr->array);
     CArray& array = std::get<CArray>(arr);
     
     auto [target_array, idx] = traverse_array(array, expr->indices);

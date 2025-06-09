@@ -1,6 +1,8 @@
 #include "interpreter.h"
 
-// bool interpret(std::istringstream& input, std::ostream& output) {
-//     Interpreter inter(input.str(), output);
-
-// }
+bool interpret(std::istream& input, std::ostream& output) {
+    Interpreter inter(input, output);
+    auto prog = inter.ParseProgram();
+    inter.Evaluate(prog);   
+    return true;
+}

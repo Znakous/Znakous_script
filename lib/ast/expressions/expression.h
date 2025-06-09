@@ -27,6 +27,8 @@ struct IdentifierExpression;
 
 struct FunctionCallExpression;
 
+struct StdFuncCallExpression;
+
 struct PrefixExpression;
 
 struct ScopedExpression;
@@ -50,7 +52,7 @@ struct StringLiteralExpression {
 
 struct FunctionCallExpression {
     Token token;
-    std::string_view function;
+    ptr<ExpressionImpl<0>> function;
     std::vector<Expression> arguments;
 };
 
@@ -60,6 +62,12 @@ struct IdentifierExpression {
 
 struct ScopedExpression {
     Expression underlying;
+};
+
+struct StdFuncCallExpression {
+    Token token;
+    std::string_view function;
+    std::vector<Expression> arguments;
 };
 
 template<size_t Level>
@@ -77,7 +85,7 @@ template<>
 struct ExpressionImpl<0> {
     std::variant<ptr<FunctionCallExpression>, ptr<StringLiteralExpression>,
     ptr<IntLiteralExpression>, ptr<IdentifierExpression>, ptr<ScopedExpression>,
-    ptr<ArrayExpression>, ptr<ArrayAccessExpression>
+    ptr<ArrayExpression>, ptr<ArrayAccessExpression>, ptr<StdFuncCallExpression>
     > value;
 };
 
@@ -95,7 +103,7 @@ struct ArrayExpression {
 };
 
 struct ArrayAccessExpression {
-    std::string_view array;
+    ptr<ExpressionImpl<0>> array;
     std::vector<Expression> indices;
 };
 

@@ -25,6 +25,18 @@ struct Interpreter{
         logger_->log("Interpreter constructed");
         #endif
     }
+    Interpreter(std::istream& input, std::ostream& output, const std::string& log_file = "interpreter.log") 
+     : output_(output),
+       logger_(logging::Logger::create()),
+       eval_(output, logger_),
+       parser_(input, logger_)
+    {
+        #ifdef DEBUG_BUILD
+        logger_->setLogFile(log_file);
+        logger_->log("Debug mode enabled - logging to console and file: ", log_file);
+        logger_->log("Interpreter constructed");
+        #endif
+    }
     ptr<Program> ParseProgram() {
         logger_->log("Starting program parsing");
         return parser_.ParseProgram();
@@ -48,17 +60,3 @@ private:
 
 bool interpret(std::istream& input, std::ostream& output);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-bool interpret(std::istream& input, std::ostream& output);
