@@ -1,28 +1,39 @@
 #include "parser.h"
 
-Parser::Parser(const char* data, std::shared_ptr<logging::Logger> log) 
-    : lexer_(data, log), logger_(log)
-{    
-    cur_token_ = lexer_.GetToken();
-    peek_token_ = lexer_.GetToken();
+Parser::Parser(const char* data, std::shared_ptr<logging::Logger> log, bool wild) 
+    : logger_(log)
+{   
+    if (wild) {
+        lexer_ = std::make_unique<WildLexer>(data, log);
+    } else {
+        lexer_ = std::make_unique<NormalLexer>(data, log);
+    }
+    cur_token_ = lexer_->GetToken();
+    peek_token_ = lexer_->GetToken();
     logger_->log("Parser initialized with tokens: ", static_cast<int>(cur_token_.type), 
                  " and ", static_cast<int>(peek_token_.type));
 }
 
-Parser::Parser(std::istream& in, std::shared_ptr<logging::Logger> log)
-    : lexer_(in, log), logger_(log)
+Parser::Parser(std::istream& in, std::shared_ptr<logging::Logger> log, bool wild)
+    : logger_(log)
 {    
-    cur_token_ = lexer_.GetToken();
-    peek_token_ = lexer_.GetToken();
+    if (wild) {
+        lexer_ =  std::make_unique<WildLexer>(in, log);
+    } else {
+        lexer_ = std::make_unique<NormalLexer>(in, log);
+    }
+    cur_token_ = lexer_->GetToken();
+    peek_token_ = lexer_->GetToken();
     logger_->log("Parser initialized with tokens: ", static_cast<int>(cur_token_.type), 
-                 " and ", static_cast<int>(peek_token_.type));
+                    " and ", static_cast<int>(peek_token_.type));
 }
+
 
 void Parser::AdvanceTokens() {
     logger_->log("Advancing tokens from: ", static_cast<int>(cur_token_.type), 
                  " and ", static_cast<int>(peek_token_.type));
     cur_token_ = peek_token_;
-    peek_token_ = lexer_.GetToken();
+    peek_token_ = lexer_->GetToken();
     logger_->log("Advanced to: ", static_cast<int>(cur_token_.type), 
                  " and ", static_cast<int>(peek_token_.type));
 }

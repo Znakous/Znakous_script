@@ -35,4 +35,5 @@
 build/
 .vscode/
 
+interpreter_log.txt
 interpreter.log

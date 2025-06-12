@@ -6,8 +6,8 @@
 #include "logger.h"
 
 struct Parser {
-    Parser(const char* data, std::shared_ptr<logging::Logger> log);
-    Parser(std::istream& in, std::shared_ptr<logging::Logger> log);
+    Parser(const char* data, std::shared_ptr<logging::Logger> log, bool wild = false);
+    Parser(std::istream& in, std::shared_ptr<logging::Logger> log, bool wild = false);
     void AdvanceTokens();
     Statement ParseStatement();
     
@@ -157,7 +157,7 @@ struct Parser {
     std::optional<ptr<ElseStatement>> ParseElseStatement();
 private:
     std::vector<Expression> ParseArguments();
-    Lexer lexer_;
+    std::unique_ptr<Lexer> lexer_;
     Token cur_token_;
     Token peek_token_;
     std::shared_ptr<logging::Logger> logger_;

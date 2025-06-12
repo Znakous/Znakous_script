@@ -7,7 +7,7 @@
 enum class TokenType {
     eof,
     func,
-    ret,
+    ret,    
     if_s, elif_s, else_s,
     number,
     plus, minus, multiply, divide, mod,

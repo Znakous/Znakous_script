@@ -6,5 +6,5 @@ add_library(itmoscript
  std_functions.cpp
  preprocess.cpp 
  token.cpp
- 
+ lexer_helpers.cpp
 )

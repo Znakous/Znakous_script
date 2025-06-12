@@ -13,11 +13,11 @@
 
 
 struct Interpreter{
-    Interpreter(const std::string& data, std::ostream& output, const std::string& log_file = "interpreter.log") 
+    Interpreter(const std::string& data, std::ostream& output, bool wild_lexer=false) 
      : output_(output),
        logger_(logging::Logger::create()),
        eval_(output, logger_),
-       parser_(data.data(), logger_)
+       parser_(data.data(), logger_, wild_lexer)
     {
         #ifdef DEBUG_BUILD
         logger_->setLogFile(log_file);
@@ -25,11 +25,11 @@ struct Interpreter{
         logger_->log("Interpreter constructed");
         #endif
     }
-    Interpreter(std::istream& input, std::ostream& output, const std::string& log_file = "interpreter.log") 
+    Interpreter(std::istream& input, std::ostream& output, bool wild_lexer=false) 
      : output_(output),
        logger_(logging::Logger::create()),
        eval_(output, logger_),
-       parser_(input, logger_)
+       parser_(input, logger_, wild_lexer)
     {
         #ifdef DEBUG_BUILD
         logger_->setLogFile(log_file);
@@ -54,6 +54,7 @@ private:
     Evaluator eval_;
     Parser parser_;
     std::string data_;
+    std::string log_file = "interpreter_log.txt";
 };
 
 

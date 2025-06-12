@@ -32,6 +32,7 @@ add_executable(
   inerpreter_tests/weirdos_tests.cpp
   inerpreter_tests/strings_tests.cpp
   inerpreter_tests/usage_scenarios_tests.cpp
+  inerpreter_tests/non_wild_tests.cpp
   # inerpreter_tests/interpreter_tests.cpp
 )
 
