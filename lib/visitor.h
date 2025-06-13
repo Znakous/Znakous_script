@@ -8,6 +8,8 @@
 #include "object.h"
 #include "logger.h"
 
+constexpr double True_val = 1.0;
+constexpr double False_val = 0.0;
 
 // using Number = double;
 // using Value = std::variant<double, std::string, bool, std::monostate>;
@@ -162,6 +164,174 @@ struct DivideVisitor : BinaryOperVisitor {
     Object operator()(const T& t, const U& u) { 
         logger_->log("Invalid division between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation divide");
+    }
+};
+
+struct EqVisitor : BinaryOperVisitor {
+    using BinaryOperVisitor::BinaryOperVisitor;
+    virtual Object operator()(Object& a, Object& b) override {
+        logger_->log("Comparing types: ", typeid(a).name(), " and ", typeid(b).name());
+        return std::visit(*this, a, b);
+    }
+    Object operator()(const double& a, const double& b) {
+        logger_->log("Comparing doubles: ", a, " == ", b);
+        return a == b ? True_val : False_val;
+    }
+    Object operator()(const std::string& a, const std::string& b) {
+        logger_->log("Comparing strings: ", a, " == ", b);
+        return a == b ? True_val : False_val;
+    }
+    template<typename T, typename U>
+    Object operator()(const T& t, const U& u) { 
+        logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
+        throw std::runtime_error("Invalid operation eq");
+    }
+};
+
+struct NeqVisitor : BinaryOperVisitor {
+    using BinaryOperVisitor::BinaryOperVisitor;
+    virtual Object operator()(Object& a, Object& b) override {
+        logger_->log("Comparing types: ", typeid(a).name(), " and ", typeid(b).name());
+        return std::visit(*this, a, b);
+    }
+    Object operator()(const double& a, const double& b) {
+        logger_->log("Comparing doubles: ", a, " != ", b);
+        return a != b ? True_val : False_val;
+    }
+    Object operator()(const std::string& a, const std::string& b) {
+        logger_->log("Comparing strings: ", a, " != ", b);
+        return a != b ? True_val : False_val;
+    }
+    template<typename T, typename U>
+    Object operator()(const T& t, const U& u) { 
+        logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
+        throw std::runtime_error("Invalid operation neq");
+    }
+};
+
+struct LessVisitor : BinaryOperVisitor {
+    using BinaryOperVisitor::BinaryOperVisitor;
+    virtual Object operator()(Object& a, Object& b) override {
+        logger_->log("Comparing types: ", typeid(a).name(), " and ", typeid(b).name());
+        return std::visit(*this, a, b);
+    }
+    Object operator()(const double& a, const double& b) {
+        logger_->log("Comparing doubles: ", a, " < ", b);
+        return a < b ? True_val : False_val;
+    }
+    Object operator()(const std::string& a, const std::string& b) {
+        logger_->log("Comparing strings: ", a, " < ", b);
+        return a < b ? True_val : False_val;   
+    }
+    template<typename T, typename U>
+    Object operator()(const T& t, const U& u) { 
+        logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
+        throw std::runtime_error("Invalid operation less");
+    }
+};
+
+struct GreaterVisitor : BinaryOperVisitor {
+    using BinaryOperVisitor::BinaryOperVisitor;
+    virtual Object operator()(Object& a, Object& b) override {
+        logger_->log("Comparing types: ", typeid(a).name(), " and ", typeid(b).name());
+        return std::visit(*this, a, b);
+    }
+    Object operator()(const double& a, const double& b) {
+        logger_->log("Comparing doubles: ", a, " > ", b);
+        return a > b ? True_val : False_val;
+    }
+    Object operator()(const std::string& a, const std::string& b) {
+        logger_->log("Comparing strings: ", a, " > ", b);
+        return a > b ? True_val : False_val;    
+    }
+    template<typename T, typename U>
+    Object operator()(const T& t, const U& u) { 
+        logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
+        throw std::runtime_error("Invalid operation greater");
+    }
+};
+
+struct LeqVisitor : BinaryOperVisitor {
+    using BinaryOperVisitor::BinaryOperVisitor;
+    virtual Object operator()(Object& a, Object& b) override {
+        logger_->log("Comparing types: ", typeid(a).name(), " and ", typeid(b).name());
+        return std::visit(*this, a, b);
+    }
+    Object operator()(const double& a, const double& b) {
+        logger_->log("Comparing doubles: ", a, " <= ", b);
+        return a <= b ? True_val : False_val;
+    }
+    Object operator()(const std::string& a, const std::string& b) {
+        logger_->log("Comparing strings: ", a, " <= ", b);
+        return a <= b ? True_val : False_val;   
+    }
+    template<typename T, typename U>
+    Object operator()(const T& t, const U& u) { 
+        logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
+        throw std::runtime_error("Invalid operation leq");
+    }
+};
+
+struct GeqVisitor : BinaryOperVisitor {
+    using BinaryOperVisitor::BinaryOperVisitor;
+    virtual Object operator()(Object& a, Object& b) override {
+        logger_->log("Comparing types: ", typeid(a).name(), " and ", typeid(b).name());
+        return std::visit(*this, a, b);
+    }
+    Object operator()(const double& a, const double& b) {
+        logger_->log("Comparing doubles: ", a, " >= ", b);
+        return a >= b ? True_val : False_val;
+    }
+    Object operator()(const std::string& a, const std::string& b) {
+        logger_->log("Comparing strings: ", a, " >= ", b);
+        return a >= b ? True_val : False_val;   
+    }   
+    template<typename T, typename U>
+    Object operator()(const T& t, const U& u) { 
+        logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
+        throw std::runtime_error("Invalid operation geq");
+    }
+};      
+
+struct BinaryAndVisitor : BinaryOperVisitor {
+    using BinaryOperVisitor::BinaryOperVisitor;
+    virtual Object operator()(Object& a, Object& b) override {
+        logger_->log("Comparing types: ", typeid(a).name(), " and ", typeid(b).name());
+        return std::visit(*this, a, b);
+    }
+    Object operator()(const double& a, const double& b) {
+        logger_->log("Comparing doubles: ", a, " && ", b);
+        return a && b ? True_val : False_val;
+    }
+    Object operator()(const std::string& a, const std::string& b) {
+        logger_->log("Comparing strings: ", a, " && ", b);
+        return (!a.empty()) && (!b.empty()) ? True_val : False_val;   
+    }
+    template<typename T, typename U>
+    Object operator()(const T& t, const U& u) { 
+        logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
+        throw std::runtime_error("Invalid operation binary and");
+    }
+};
+
+struct BinaryOrVisitor : BinaryOperVisitor {
+    using BinaryOperVisitor::BinaryOperVisitor;
+    virtual Object operator()(Object& a, Object& b) override {
+        logger_->log("Comparing types: ", typeid(a).name(), " and ", typeid(b).name());
+        return std::visit(*this, a, b);
+    }
+    Object operator()(const double& a, const double& b) {
+        logger_->log("Comparing doubles: ", a, " || ", b);
+        return a || b ? True_val : False_val;
+    }
+    Object operator()(const std::string& a, const std::string& b) {
+        logger_->log("Comparing strings: ", a, " || ", b);
+        return (!a.empty()) || (!b.empty()) ? True_val : False_val;   
+    }
+    template<typename T, typename U>
+    Object operator()(const T& t, const U& u) { 
+        logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
+        throw std::runtime_error("Invalid operation binary or");
     }
 };
 

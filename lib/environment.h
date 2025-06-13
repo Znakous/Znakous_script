@@ -55,19 +55,34 @@ struct Environment {
         logger_->log("Object found");
         return resp->param;
     }
+    bool HasByIdent(std::string_view ident) {
+        if(namespc_->get(ident.data()).has_value()) {
+            logger_->log("Ident found in current environment");
+            return true;
+        }
+        if (parent_) {
+            logger_->log("Ident not found in current environment, checking parent");
+            return parent_->HasByIdent(ident);
+        }
+        return false;
+    }
+
+    void SetByIdent(std::string_view ident, Object value) {
+        if (HasByIdent(ident)) {
+            this->operator[](ident) = value;
+        } else {
+            this->Declare(ident);
+            this->operator[](ident) = value;
+        }
+    }
 
     Object& operator[](std::string_view ident) {
         logger_->log("Resolving ident: ", ident);
         auto resp = namespc_->get(ident.data());
         if (!resp.has_value() || resp.value().size != ident.size()) {
             if (parent_) {
-                auto parent_val = parent_->GetByIdent(ident);
-                if (parent_val) {
-                    namespc_->insert(ident, parent_val.value());
-                    return namespc_->get_nocheck(ident.data());
-                }
+                return parent_->operator[](ident);
             }
-            namespc_->insert(ident, CNull());
         }
         // if (resp.value().size != ident.size()) {
         //     return std::nullopt;
@@ -76,6 +91,9 @@ struct Environment {
     }
 
     void Declare(std::string_view ident) {
+        if (HasByIdent(ident)) {
+            return;
+        }
         logger_->log("Declaring ident: ", ident);
         if (!namespc_->get(ident.data())){
             logger_->log("Ident not found, declaring");
@@ -90,7 +108,7 @@ struct Environment {
     }
 
     Trie<Object>* namespc_;
-    Environment* parent_;
+    Environment* parent_=nullptr;
     std::shared_ptr<logging::Logger> logger_;
 };
 

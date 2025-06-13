@@ -24,6 +24,13 @@ bool IsLevelOperator<3>(Token token) {
     return (token.type == TokenType::plus) || (token.type == TokenType::minus);
 }
 
+template<>
+bool IsLevelOperator<4>(Token token) {
+    return (token.type == TokenType::less) || (token.type == TokenType::greater)
+        || (token.type == TokenType::leq) || (token.type == TokenType::geq)
+        || (token.type == TokenType::eq) || (token.type == TokenType::neq);
+}
+
 // constexpr bool allowed_in_identifier[255];
 
 // struct IdentLookup {

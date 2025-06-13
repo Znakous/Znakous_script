@@ -69,19 +69,23 @@ Stopping Evaluator::operator()(ptr<ExprStatement>& expr) {
 
 Stopping Evaluator::operator()(ptr<WhileStatement>& expr) {
     logger_->log("Processing while statement");
+    env_.Enclose();  // Create environment once before the loop
     while (std::visit(TruthChecker{}, std::visit(*this, expr->condition))) {
         logger_->log("Executing while body");
         for (decltype(auto) el : expr->body) {
             auto stop_res = std::visit(*this, el);
             if (stop_res == Stopping::break_s) {
-                return Stopping::none; 
+                env_.OutClose();
+                return Stopping::none;  // Break out of the loop
             } else if (stop_res == Stopping::return_s) {
-                return Stopping::return_s;
+                env_.OutClose();
+                return Stopping::return_s;  // Return from function
             } else if (stop_res == Stopping::continue_s) {
-                break;
+                break;  // Continue to next iteration
             }
         }
     }
+    env_.OutClose();
     return Stopping::none;
 }
 Object Evaluator::operator()(ptr<IntLiteralExpression>& expr) {

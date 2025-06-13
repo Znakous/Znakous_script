@@ -19,6 +19,12 @@ struct BinaryOperatorExecutor {
         visitors.emplace(TokenType::minus, std::make_unique<SubVisitor>(log));
         visitors.emplace(TokenType::multiply, std::make_unique<MultVisitor>(log));
         visitors.emplace(TokenType::divide, std::make_unique<DivideVisitor>(log));
+        visitors.emplace(TokenType::eq, std::make_unique<EqVisitor>(log));
+        visitors.emplace(TokenType::neq, std::make_unique<NeqVisitor>(log));
+        visitors.emplace(TokenType::less, std::make_unique<LessVisitor>(log));
+        visitors.emplace(TokenType::greater, std::make_unique<GreaterVisitor>(log));
+        visitors.emplace(TokenType::leq, std::make_unique<LeqVisitor>(log));
+        visitors.emplace(TokenType::geq, std::make_unique<GeqVisitor>(log));
     }
 
     Object Execute(TokenType oper, Object& a, Object& b) {
