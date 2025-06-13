@@ -23,7 +23,7 @@ add_executable(
   # lexer_tests.cpp
   # parser_tests.cpp
   # interpreter_tests.cpp
-  # function_test.cpp
+  function_test.cpp
   # types_test.cpp
   # loop_and_branch_test.cpp
   inerpreter_tests/simplests_tests.cpp
@@ -35,6 +35,7 @@ add_executable(
   inerpreter_tests/non_wild_tests.cpp
   inerpreter_tests/wild_tests.cpp
   inerpreter_tests/operators_tests.cpp
+  inerpreter_tests/real_programs_tests.cpp
   # inerpreter_tests/interpreter_tests.cpp
 )
 

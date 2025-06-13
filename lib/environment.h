@@ -41,22 +41,23 @@ struct Environment {
     std::optional<Object> GetByIdent(std::string_view ident) {
         logger_->log("Getting object by ident: ", ident);
         auto resp = namespc_->get(ident.data());
-        if (!resp.has_value()) {
+        if (!resp.has_value() || resp.value().size != ident.size()) {
             if (parent_) {
                 logger_->log("Parent found, getting object");
                 return parent_->GetByIdent(ident);
             }
+            logger_->log("Object not found");
             return std::nullopt;
         } 
-        if (resp.value().size != ident.size()) {
-            logger_->log("Object size mismatch");
-            return std::nullopt;
-        }
+        // if (resp.value().size != ident.size()) {
+        //     logger_->log("Object size mismatch");
+        //     return std::nullopt;
+        // }
         logger_->log("Object found");
         return resp->param;
     }
     bool HasByIdent(std::string_view ident) {
-        if(namespc_->get(ident.data()).has_value()) {
+        if(namespc_->get(ident.data()).has_value() && namespc_->get(ident.data())->size == ident.size()) {
             logger_->log("Ident found in current environment");
             return true;
         }
@@ -67,12 +68,25 @@ struct Environment {
         return false;
     }
 
+    bool HasHere(std::string_view ident) {
+        return namespc_->get(ident.data()).has_value() && namespc_->get(ident.data())->size == ident.size();
+    }
+
     void SetByIdent(std::string_view ident, Object value) {
         if (HasByIdent(ident)) {
             this->operator[](ident) = value;
         } else {
             this->Declare(ident);
             this->operator[](ident) = value;
+        }
+    }
+
+    void SetHere(std::string_view ident, Object value) {
+        if (HasHere(ident)) {
+            namespc_->get_nocheck(ident.data()) = value;
+        } else {
+            Declare(ident, true);
+            namespc_->insert(ident, value);
         }
     }
 
@@ -90,12 +104,15 @@ struct Environment {
         return namespc_->get_nocheck(ident.data());
     }
 
-    void Declare(std::string_view ident) {
-        if (HasByIdent(ident)) {
+    void Declare(std::string_view ident, bool is_local = false) {
+        if (is_local && HasHere(ident)) {
+            return;
+        }
+        if (HasByIdent(ident) && !is_local) {
             return;
         }
         logger_->log("Declaring ident: ", ident);
-        if (!namespc_->get(ident.data())){
+        if (!namespc_->get(ident.data()) || namespc_->get(ident.data())->size != ident.size()){
             logger_->log("Ident not found, declaring");
             namespc_->insert(ident, CNull());
         }

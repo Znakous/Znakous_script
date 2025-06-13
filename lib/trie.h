@@ -27,7 +27,7 @@ struct TrieResponse {
 };
 
 
-template<typename T>
+template<typename T, bool strict = false>
 class Trie {
 public:
     using Node = TrieNode<T>;

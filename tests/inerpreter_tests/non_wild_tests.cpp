@@ -33,5 +33,5 @@ TEST(NonWildTests, SimpleFunctionTest) {
     Interpreter p(code, test, false);
     auto el = p.ParseProgram();
     p.Evaluate(el);
-    ASSERT_EQ(test.str(), "3");
+    ASSERT_EQ(test  .str(), "3");
 }

@@ -112,21 +112,19 @@ Object Evaluator::operator()(ptr<FunctionCallExpression>& expr) {
         throw std::runtime_error("Function call is smae");
     }
     auto function = this->operator()(expr->function);
-
-
     ptr<FunctionalExpression> to_invoke = std::get<ptr<FunctionalExpression>>(function);
     logger_->log("Function resolved, preparing to invoke");
     
     env_.Enclose();
     
-    if (to_invoke->closure_env) {
-        env_.current->CopyFrom(*to_invoke->closure_env);
-    }
+    // if (to_invoke->closure_env) {
+    //     env_.current->CopyFrom(*to_invoke->closure_env);
+    // }
     
     for (int i = 0; i < to_invoke->arguments.size(); ++i) {
         logger_->log("Processing argument: ", to_invoke->arguments[i]);
-        env_.Declare(to_invoke->arguments[i]);
-        env_[to_invoke->arguments[i]] = std::visit(*this, expr->arguments[i]);
+        // env_.current->Declare(to_invoke->arguments[i], true);
+        env_.current->SetHere(to_invoke->arguments[i], std::visit(*this, expr->arguments[i]));
     }
     
     for (decltype(auto) st : to_invoke->body) {
