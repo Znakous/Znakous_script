@@ -6,7 +6,7 @@
 #include <vector>
 #include <ostream>
 #include "ast/expressions/expression_fwd.h"
-#include "std_function_fwd.h"
+#include "std_functions_impls/std_func_include.h"
 
 struct CNull {};
 
@@ -17,7 +17,7 @@ inline std::ostream& operator<<(std::ostream& out, CNull) {
 
 using BuiltinFuncPtr = ptr<FunctionalExpression>;
 using BuiltinArray = ptr<ArrayExpression>;
-using StdFuncPtr = std::shared_ptr<StdFunc>;
+
 
 struct Object;
 

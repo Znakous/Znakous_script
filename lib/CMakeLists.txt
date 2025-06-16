@@ -1,10 +1,14 @@
+file(GLOB_RECURSE SOURCES 
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+)
+
 add_library(itmoscript
- interpreter.cpp 
- evaluator.cpp
- parser.cpp 
- lexer.cpp 
- std_functions.cpp
- preprocess.cpp 
- token.cpp
- lexer_helpers.cpp
+    ${SOURCES}
+)
+add_subdirectory(std_functions_impls)
+add_dependencies(itmoscript std_func_all)
+
+target_include_directories(itmoscript PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
 )

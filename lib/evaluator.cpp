@@ -1,5 +1,5 @@
 #include "evaluator.h"
-#include "std_functions.h"
+#include "std_functions_impls/std_func_spec.h"
 #include "logger.h"
 
 double stoi_view(std::string_view s) {
@@ -112,7 +112,7 @@ Object Evaluator::operator()(ptr<StdFuncCallExpression>& expr) {
     for (auto& arg : expr->arguments) {
         args.push_back(std::visit(*this, arg));
     }   
-    auto to_exec = GetStdFunc(expr->function, out_, std::move(args));
+    auto to_exec = std_func_getter_.GetStdFunc(expr->function, out_, std::move(args));
     return std::visit(Executor{}, *to_exec);
 }
 Object Evaluator::operator()(ptr<FunctionCallExpression>& expr) {

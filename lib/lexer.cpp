@@ -1,7 +1,7 @@
 #include "lexer.h"
 #include "preprocess.h"
 #include "lexer_helpers.h"
-#include "std_function_fwd.h"
+#include "std_functions_impls/std_func_include.h"
 
 
 Lexer::Lexer(std::string&& data, std::shared_ptr<logging::Logger> logger)

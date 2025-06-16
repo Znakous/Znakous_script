@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <stdexcept>
 
-#include "std_function_fwd.h"
+#include "std_functions_impls/std_func_include.h"
 
 enum class TokenType {
     eof,

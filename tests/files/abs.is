@@ -1,0 +1,3 @@
+a = 47
+b = -14
+print(abs(a), abs(b), abs(-55) + abs(8 * 3 - 1))

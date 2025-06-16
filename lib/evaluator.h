@@ -14,6 +14,7 @@
 #include "object.h"
 #include "ast/ast.h"
 #include "logger.h"
+#include "std_functions_impls/std_func_spec.h"
 
 double stoi_view(std::string_view);
 
@@ -96,5 +97,6 @@ private:
     EnvironmentMaster env_;
     BinaryOperatorExecutor exec_bin_;
     UnaryOperatorExecutor exec_un_;
+    StdFuncGetter std_func_getter_;
     std::shared_ptr<logging::Logger> logger_;
 };
