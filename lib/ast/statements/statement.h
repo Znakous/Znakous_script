@@ -25,12 +25,14 @@ struct Program {
 struct AssignStatement {
     std::string_view ident;
     Expression expr;
+    std::optional<TokenType> funny_assign;
 };  
 
 struct ArrayAssignStatement {
     std::string_view array;
     std::vector<Expression> indices;
     Expression value;
+    std::optional<TokenType> funny_assign;
 };
 
 

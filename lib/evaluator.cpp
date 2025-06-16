@@ -46,6 +46,13 @@ Stopping Evaluator::operator()(ptr<AssignStatement>& expr) {
     logger_->log("Processing assignment");
     env_.Declare(expr->ident);
     auto rhs = std::visit(*this, expr->expr);
+    if (expr->funny_assign.has_value()) {
+        auto lhs = env_.GetByIdent(expr->ident);
+        if (!lhs.has_value()) {
+            throw std::runtime_error("Variable " + std::string(expr->ident) + " is not declared");
+        }
+        rhs = exec_bin_.Execute(expr->funny_assign.value(), lhs.value(), rhs);
+    }
     logger_->log("Assigning to identifier: ", expr->ident);
     env_[expr->ident] = rhs;
     return Stopping::none;
@@ -96,7 +103,10 @@ Object Evaluator::operator()(ptr<StringLiteralExpression>& expr) {
     logger_->log("Evaluating string literal");
     return std::string(expr->literal.value.value());
 }
-
+Object Evaluator::operator()(ptr<NullLiteralExpression>& expr) {
+    logger_->log("Evaluating null literal");
+    return CNull();
+}
 Object Evaluator::operator()(ptr<StdFuncCallExpression>& expr) {
     std::vector<Object> args;
     for (auto& arg : expr->arguments) {
@@ -274,7 +284,8 @@ Stopping Evaluator::operator()(ptr<ArrayAssignStatement>& expr) {
         if (idx >= array.arr.size()) {
             array.arr.resize(idx + 1);
         }
-        array.arr[idx] = value;
+        std::cout << "idx: " << idx << "\n";
+        array.arr[idx] = ExecFunnyAssign(expr->funny_assign, array.arr[idx], value);
         return Stopping::none;
     }
     
@@ -296,7 +307,15 @@ Stopping Evaluator::operator()(ptr<ArrayAssignStatement>& expr) {
     if (final_idx >= current_array->arr.size()) {
         current_array->arr.resize(final_idx + 1);
     }
-    current_array->arr[final_idx] = value;
-    
+    std::cout << "final_idx: " << final_idx << "\n";
+    current_array->arr[final_idx] = ExecFunnyAssign(expr->funny_assign, current_array->arr[final_idx], value);
     return Stopping::none;
+}
+
+
+Object Evaluator::ExecFunnyAssign(std::optional<TokenType> funny_assign, Object& lhs, Object& rhs) {
+    if (funny_assign.has_value()) {
+        return exec_bin_.Execute(funny_assign.value(), lhs, rhs);
+    }
+    return rhs;
 }

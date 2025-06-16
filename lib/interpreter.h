@@ -47,7 +47,6 @@ struct Interpreter{
             std::visit(eval_, st);
         }
     }
-    
 private:
     std::reference_wrapper<std::ostream> output_;
     std::shared_ptr<logging::Logger> logger_;
@@ -61,3 +60,4 @@ private:
 
 bool interpret(std::istream& input, std::ostream& output);
 
+bool interpret_file(std::string_view file_name, std::ostream& output);

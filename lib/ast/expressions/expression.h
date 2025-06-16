@@ -41,6 +41,7 @@ struct ExpressionImpl;
 template<>
 struct ExpressionImpl<0>;
 
+struct NullLiteralExpression {};
 
 struct IntLiteralExpression {
     Token literal;
@@ -84,7 +85,7 @@ struct ExpressionImpl<1> { // for prefix operations only
 template<>
 struct ExpressionImpl<0> {
     std::variant<ptr<FunctionCallExpression>, ptr<StringLiteralExpression>,
-    ptr<IntLiteralExpression>, ptr<IdentifierExpression>, ptr<ScopedExpression>,
+    ptr<IntLiteralExpression>, ptr<IdentifierExpression>, ptr<ScopedExpression>, ptr<NullLiteralExpression>,
     ptr<ArrayExpression>, ptr<ArrayAccessExpression>, ptr<ArraySliceExpression>, ptr<StdFuncCallExpression>
     > value;
 };

@@ -5,7 +5,7 @@
 #include <functional>
 
 
-constexpr size_t operators_levels = 4;
+constexpr size_t operators_levels = 5;
 
 
 

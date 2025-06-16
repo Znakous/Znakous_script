@@ -78,6 +78,7 @@ struct Evaluator {
 
     Object operator()(ptr<IntLiteralExpression>& expr);
     Object operator()(ptr<StringLiteralExpression>& expr);
+    Object operator()(ptr<NullLiteralExpression>& expr);
     Object operator()(ptr<FunctionalExpression>& expr);
     Object operator()(ptr<FunctionCallExpression>& expr);
     Object operator()(ptr<IdentifierExpression>& expr);
@@ -89,6 +90,7 @@ struct Evaluator {
 private:
     Object ExecStd(ptr<StdFuncCallExpression>& expr);
     std::pair<CArray*, size_t> traverse_array(CArray& root_array, std::vector<Expression>& indices);
+    Object ExecFunnyAssign(std::optional<TokenType> funny_assign, Object& lhs, Object& rhs);
     std::optional<Object> return_object_;
     std::reference_wrapper<std::ostream> out_;
     EnvironmentMaster env_;

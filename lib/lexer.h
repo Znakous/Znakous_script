@@ -17,10 +17,10 @@ public:
     virtual void ReadOne() = 0;
     Token PeekToken();
     Token GetToken();
+    TokenType GetFunnyAssign(std::string_view op);
 protected:
     void FindNext(char symbol);
     void FindNumber(bool met_e, bool e_was_last);
-
     virtual Token NextToken() = 0;
 
     std::string str_;

@@ -12,6 +12,8 @@ struct IntLiteralExpression;
 
 struct StringLiteralExpression;
 
+struct NullLiteralExpression;
+
 struct IdentifierExpression;
 
 struct FunctionCallExpression;

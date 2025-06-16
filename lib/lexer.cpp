@@ -1,6 +1,7 @@
 #include "lexer.h"
 #include "preprocess.h"
 #include "lexer_helpers.h"
+#include "std_function_fwd.h"
 
 
 Lexer::Lexer(std::string&& data, std::shared_ptr<logging::Logger> logger)
@@ -67,6 +68,14 @@ void Lexer::FindNumber(bool met_e=false, bool e_was_last=false) {
         FindNumber(met_e, false);
     }
     return;
+}
+
+TokenType Lexer::GetFunnyAssign(std::string_view op) {
+    auto resp = keywords_.get(op.data());
+    if (resp.has_value()) {
+        return resp.value().param.type;
+    }
+    return TokenType::invalid;
 }
 
 Token WildLexer::NextToken() {

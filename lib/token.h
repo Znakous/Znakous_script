@@ -3,6 +3,9 @@
 #include <optional>
 #include <string_view>
 #include <unordered_map>
+#include <stdexcept>
+
+#include "std_function_fwd.h"
 
 enum class TokenType {
     eof,
@@ -25,7 +28,9 @@ enum class TokenType {
     break_s,
     continue_s,
     colon,
-    slice_access
+    slice_access,
+    power,
+    funny_assign, null
 };
 
 
@@ -62,11 +67,18 @@ constexpr std::pair<std::string_view, Token> keywords[] = {
     {"{", {TokenType::lbrace, std::nullopt}},
     {"}", {TokenType::rbrace, std::nullopt}},
     {"=", {TokenType::assign, std::nullopt}},
+    {"+=", {TokenType::funny_assign, "+"}},
+    {"-=", {TokenType::funny_assign, "-"}},
+    {"*=", {TokenType::funny_assign, "*"}},
+    {"/=", {TokenType::funny_assign, "/"}},
+    {"%=", {TokenType::funny_assign, "%"}},
+    {"^=", {TokenType::funny_assign, "^"}},
     {"+", {TokenType::plus, std::nullopt}},
     {"-", {TokenType::minus, std::nullopt}},
     {"*", {TokenType::multiply, std::nullopt}},
     {"/", {TokenType::divide, std::nullopt}},
     {"%", {TokenType::mod, std::nullopt}},
+    {"^", {TokenType::power, std::nullopt}},
     {"==", {TokenType::eq, std::nullopt}},
     {"<", {TokenType::less, std::nullopt}},
     {">", {TokenType::greater, std::nullopt}},
@@ -78,11 +90,10 @@ constexpr std::pair<std::string_view, Token> keywords[] = {
     {":", {TokenType::colon, std::nullopt}},
     {"true", {TokenType::intliteral, "1"}},
     {"false", {TokenType::intliteral, "0"}},
+    {"null", {TokenType::null, std::nullopt}},
+    {"nil", {TokenType::null, std::nullopt}},
 };
-constexpr std::string_view std_funcs[] = {
-    "print",
-    "parsenum"
-};
+
 
 bool IsPrefixOperator(TokenType type);
 
@@ -100,20 +111,9 @@ bool IsLevelOperator<3>(Token token);
 
 template<>
 bool IsLevelOperator<4>(Token token);
-// constexpr bool allowed_in_identifier[255];
 
-// struct IdentLookup {
-//     IdentLookup() : table_({
-        
+template<>
+bool IsLevelOperator<5>(Token token);
 
-        
-//     }) {}
 
-//     bool Contains(std::string_view value) {
-//         return table_.contains(value);
-//     }
-//     void Add(std::string_view value, TokenType type) {
-//         table_[value] = type;
-//     }
-//     std::unordered_map<std::string_view, TokenType> table_ ;
-// };
+// TokenType GetFunnyAssign(std::string_view op);

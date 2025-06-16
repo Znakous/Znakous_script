@@ -3,6 +3,8 @@
 #include <string>
 #include <variant>
 #include <stdexcept>
+#include <memory>
+#include <cmath>
 
 #include "usings.h"
 #include "object.h"
@@ -335,14 +337,39 @@ struct BinaryOrVisitor : BinaryOperVisitor {
     }
 };
 
+struct PowerVisitor : BinaryOperVisitor {
+    using BinaryOperVisitor::BinaryOperVisitor;
+    virtual Object operator()(Object& a, Object& b) override {
+        logger_->log("Computing power operation between types: ", typeid(a).name(), " and ", typeid(b).name());
+        return std::visit(*this, a, b);
+    }
+    Object operator()(const double& a, const double& b) {
+        logger_->log("Computing power: ", a, " ^ ", b);
+        return std::pow(a, b);
+    }
+    template<typename T, typename U>
+    Object operator()(const T& t, const U& u) { 
+        logger_->log("Invalid power operation between types: ", typeid(T).name(), " and ", typeid(U).name());
+        throw std::runtime_error("Invalid operation power");
+    }
+};
 
-// inline Object operator+(Object& a, Object& b) {
-//     return std::visit(AddVisitor{}, a, b);
-// }
-
-// inline Object operator-(Object& a, Object& b) {
-//     return std::visit(SubVisitor{}, a, b);
-// }
-// inline Object operator*(Object& a, Object& b) {
-//     return std::visit(MultVisitor{}, a, b);
-// }
+struct ModVisitor : BinaryOperVisitor {
+    using BinaryOperVisitor::BinaryOperVisitor;
+    virtual Object operator()(Object& a, Object& b) override {
+        logger_->log("Computing modulo operation between types: ", typeid(a).name(), " and ", typeid(b).name());
+        return std::visit(*this, a, b);
+    }
+    Object operator()(const double& a, const double& b) {
+        logger_->log("Computing modulo: ", a, " % ", b);
+        if (b == 0) {
+            throw std::runtime_error("Division by zero in modulo operation");
+        }
+        return std::fmod(a, b);
+    }
+    template<typename T, typename U>
+    Object operator()(const T& t, const U& u) { 
+        logger_->log("Invalid modulo operation between types: ", typeid(T).name(), " and ", typeid(U).name());
+        throw std::runtime_error("Invalid operation modulo");
+    }
+};

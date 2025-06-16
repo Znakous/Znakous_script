@@ -101,6 +101,7 @@ struct Parser {
             ident->name = name;
             expr->value = ident;
             
+            
             // Handle function calls and array access/slice
             while (cur_token_.type == TokenType::lparen || cur_token_.type == TokenType::lsquare) {
                 if (cur_token_.type == TokenType::lparen) {
@@ -188,6 +189,11 @@ struct Parser {
             AdvanceTokens();
             call->arguments = ParseArguments();
             ans->value = call;
+        }
+        else if (cur_token_.type == TokenType::null) {
+            logger_->log("Parsing null literal");
+            AdvanceTokens();
+            ans->value = make_ptr<NullLiteralExpression>();
         }
         return ans;
     }

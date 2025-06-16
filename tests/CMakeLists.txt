@@ -34,10 +34,11 @@ add_executable(
   # inerpreter_tests/usage_scenarios_tests.cpp
   # inerpreter_tests/non_wild_tests.cpp
   # inerpreter_tests/wild_tests.cpp
-  # inerpreter_tests/operators_tests.cpp
+  inerpreter_tests/operators_tests.cpp
   # inerpreter_tests/real_programs_tests.cpp
-  inerpreter_tests/slices_tests.cpp
+  # inerpreter_tests/slices_tests.cpp
   # inerpreter_tests/interpreter_tests.cpp
+  files_tests.cpp
 )
 
 target_link_libraries(

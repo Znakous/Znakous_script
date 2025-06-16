@@ -25,6 +25,8 @@ struct BinaryOperatorExecutor {
         visitors.emplace(TokenType::greater, std::make_unique<GreaterVisitor>(log));
         visitors.emplace(TokenType::leq, std::make_unique<LeqVisitor>(log));
         visitors.emplace(TokenType::geq, std::make_unique<GeqVisitor>(log));
+        visitors.emplace(TokenType::mod, std::make_unique<ModVisitor>(log));
+        visitors.emplace(TokenType::power, std::make_unique<PowerVisitor>(log));
     }
 
     Object Execute(TokenType oper, Object& a, Object& b) {

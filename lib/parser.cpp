@@ -75,7 +75,8 @@ Statement Parser::ParseAssignStatement() {
         logger_->log("Not an identifier, parsing as expression statement");
         return ParseExprStatement();
     }
-    if (peek_token_.type != TokenType::assign && peek_token_.type != TokenType::lsquare) {
+    
+    if (peek_token_.type != TokenType::assign && peek_token_.type != TokenType::lsquare && peek_token_.type != TokenType::funny_assign) {
         logger_->log("Not an assignment or array access, parsing as expression statement");
         return ParseExprStatement();
     }
@@ -84,25 +85,50 @@ Statement Parser::ParseAssignStatement() {
     logger_->log("Processing identifier: ", ident);
     AdvanceTokens();
 
-    if (!(cur_token_.type == TokenType::lsquare)) {
-        logger_->log("Parsing simple assignment");
-        ptr<AssignStatement> ans = make_ptr<AssignStatement>();
-        ans->ident = ident;
+    if (cur_token_.type == TokenType::lsquare) {
+        logger_->log("Parsing array assignment");
+        ptr<ArrayAssignStatement> ans = make_ptr<ArrayAssignStatement>();
+        ans->array = ident;
+        while (cur_token_.type == TokenType::lsquare) {
+            AdvanceTokens();
+            ans->indices.push_back(ParseExpression());
+            AdvanceTokens();
+        }
+        if (cur_token_.type == TokenType::funny_assign) {
+            ans->funny_assign = lexer_->GetFunnyAssign(cur_token_.value.value());
+            logger_->log("Funny assign: ", static_cast<int>(ans->funny_assign.value()));
+        }
         AdvanceTokens();
-        ans->expr = ParseExpression();
+        
+        ans->value = ParseExpression();
         return ans;
     }
 
-    logger_->log("Parsing array assignment");
-    ptr<ArrayAssignStatement> ans = make_ptr<ArrayAssignStatement>();
-    ans->array = ident;
-    while (cur_token_.type == TokenType::lsquare) {
+    logger_->log("Parsing simple or compound assignment");
+    ptr<AssignStatement> ans = make_ptr<AssignStatement>();
+    ans->ident = ident;
+    
+    if (cur_token_.type == TokenType::funny_assign) {
+        ans->funny_assign = lexer_->GetFunnyAssign(cur_token_.value.value());
+        logger_->log("Funny assign: ", static_cast<int>(ans->funny_assign.value()));
         AdvanceTokens();
-        ans->indices.push_back(ParseExpression());
+        
+        // Parse the right-hand side expression
+        Expression rhs = ParseExpression();
+        
+        // Create a new identifier expression for the left side
+        auto id_expr = make_ptr<ExpressionImpl<0>>();
+        id_expr->value = make_ptr<IdentifierExpression>();
+        std::get<ptr<IdentifierExpression>>(id_expr->value)->name = ident;
+        
+        // Create the binary operation at level 3
+        
+        ans->expr = rhs;
+    } else {
         AdvanceTokens();
+        ans->expr = ParseExpression();
     }
-    AdvanceTokens(); // skip =
-    ans->value = ParseExpression();
+    
     return ans;
 }
 
