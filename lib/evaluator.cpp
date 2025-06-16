@@ -196,11 +196,66 @@ std::pair<CArray*, size_t> Evaluator::traverse_array(CArray& root_array, std::ve
     return {current_array, final_idx};
 }
 
+Object Evaluator::operator()(ptr<ArraySliceExpression>& expr) {
+    logger_->log("Evaluating array slice");
+    
+    Object array_obj = operator()(expr->array);
+    if (!std::holds_alternative<CArray>(array_obj)) {
+        throw std::runtime_error("Cannot slice a non-array object");
+    }
+    logger_->log("Array object");
+    
+    const CArray& source_array = std::get<CArray>(array_obj);
+    int64_t array_size = static_cast<int64_t>(source_array.arr.size());
+    int64_t start = 0;
+    int64_t end = array_size;
+    int64_t step = 1;
+    
+    if (expr->start) {
+        Object start_obj = std::visit(*this, *expr->start);
+        start = static_cast<int64_t>(std::get<double>(start_obj));
+        if (start < 0) start += array_size;
+        start = std::max(int64_t(0), std::min(start, array_size));
+    }
+    
+    if (expr->end) {
+        Object end_obj = std::visit(*this, *expr->end);
+        end = static_cast<int64_t>(std::get<double>(end_obj));
+        if (end < 0) end += array_size;
+        end = std::max(int64_t(0), std::min(end, array_size));
+    }
+    
+    if (expr->step) {
+        Object step_obj = std::visit(*this, *expr->step);
+        step = static_cast<int64_t>(std::get<double>(step_obj));
+        if (step == 0) {
+            throw std::runtime_error("Slice step cannot be zero");
+        }
+    }
+    
+    CArray result;
+    if (step > 0) {
+        for (int64_t i = start; i < end; i += step) {
+            result.arr.push_back(source_array.arr[i]);
+        }
+    } else {
+        for (int64_t i = start; i > end; i += step) {
+            result.arr.push_back(source_array.arr[i]);
+        }
+    }
+    
+    return result;
+}
+
 Object Evaluator::operator()(ptr<ArrayAccessExpression>& expr) {
     logger_->log("Accessing array");
     auto arr = this->operator()(expr->array);
-    CArray& array = std::get<CArray>(arr);
     
+    if (!std::holds_alternative<CArray>(arr)) {
+        throw std::runtime_error("Cannot index a non-array object");
+    }
+    
+    CArray& array = std::get<CArray>(arr);
     auto [target_array, idx] = traverse_array(array, expr->indices);
     return target_array->arr[idx];
 }

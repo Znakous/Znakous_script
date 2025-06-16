@@ -154,7 +154,9 @@ Expression Parser::ParseExpression() {
         logger_->log("Function parsing completed");
         return ans;
     } else {
-        return ParseLeveledExpression<operators_levels>();
+        Expression expr = ParseLeveledExpression<operators_levels>();
+        
+        return expr;
     }
 }
 
@@ -266,4 +268,64 @@ std::vector<Expression> Parser::ParseArguments() {
     AdvanceTokens(); // skip )
     logger_->log("Arguments parsing completed");
     return arguments;
+}
+
+ptr<ExpressionImpl<0>> Parser::ParseArrayAccess(ptr<ExpressionImpl<0>> array) {
+    logger_->log("Parsing array access or slice");
+    AdvanceTokens(); // skip [
+
+    if (cur_token_.type == TokenType::colon) {
+        // Handle [:end] case
+        return ParseArraySlice(array, std::nullopt);
+    }
+
+    if (peek_token_.type == TokenType::colon) {
+        // Handle [start:...] case
+        Expression start = ParseExpression();
+        return ParseArraySlice(array, start);
+    }
+
+    // Regular array access
+    ptr<ArrayAccessExpression> array_access = make_ptr<ArrayAccessExpression>();
+    array_access->array = array;
+    array_access->indices.push_back(ParseExpression());
+    AdvanceTokens(); // skip ]
+
+    // Create level 0 expression
+    ptr<ExpressionImpl<0>> expr = make_ptr<ExpressionImpl<0>>();
+    expr->value = array_access;
+    return expr;
+}
+
+ptr<ExpressionImpl<0>> Parser::ParseArraySlice(ptr<ExpressionImpl<0>> array, std::optional<Expression> start) {
+    logger_->log("Parsing array slice");
+    ptr<ArraySliceExpression> slice = make_ptr<ArraySliceExpression>();
+    slice->array = array;
+    slice->start = start;
+
+    if (cur_token_.type == TokenType::colon) {
+        AdvanceTokens(); // skip first :
+    }
+
+    // Parse end if present
+    if (cur_token_.type != TokenType::colon && cur_token_.type != TokenType::rsquare) {
+        slice->end = ParseExpression();
+    }
+
+    // Parse step if present
+    if (cur_token_.type == TokenType::colon) {
+        AdvanceTokens(); // skip second :
+        if (cur_token_.type != TokenType::rsquare) {
+            slice->step = ParseExpression();
+        }
+    }
+
+    if (cur_token_.type == TokenType::rsquare) {
+        AdvanceTokens(); // skip ]
+    }
+
+    // Create level 0 expression
+    ptr<ExpressionImpl<0>> expr = make_ptr<ExpressionImpl<0>>();
+    expr->value = slice;
+    return expr;
 }

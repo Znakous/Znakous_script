@@ -84,6 +84,7 @@ struct Evaluator {
     Object operator()(ptr<ScopedExpression>& expr);
     Object operator()(ptr<ArrayExpression>& expr);
     Object operator()(ptr<ArrayAccessExpression>& expr);
+    Object operator()(ptr<ArraySliceExpression>& expr);
     Object operator()(ptr<StdFuncCallExpression>& expr);
 private:
     Object ExecStd(ptr<StdFuncCallExpression>& expr);

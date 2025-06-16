@@ -26,6 +26,8 @@ struct ArrayExpression;
 
 struct ArrayAccessExpression;
 
+struct ArraySliceExpression;
+
 // level-building
 
 template<size_t Level>

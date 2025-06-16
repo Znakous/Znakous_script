@@ -42,3 +42,4 @@ struct Object : std::variant<
         StdFuncPtr
     >::variant;
 };
+

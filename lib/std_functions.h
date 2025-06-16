@@ -19,6 +19,9 @@ struct Print {
         out << "[";
         for (size_t i = 0; i < a.arr.size(); ++i) {
             std::visit(*this, a.arr[i]);
+            if (i != a.arr.size() - 1) {
+                out << ", ";
+            }
         }
         out << "]";
     }

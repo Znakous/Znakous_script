@@ -9,7 +9,7 @@ constexpr std::bitset<256> make_char_bitset(const char* str) {
 }
 
 
-constexpr auto forbidden_chars_bitset = make_char_bitset("<>=)({}[];' ,.!@#%^&*/-\"+~");
+constexpr auto forbidden_chars_bitset = make_char_bitset("<>=)({}[];' ,.:!@#%^&*/-\"+~");
 constexpr auto forbidden_startchars_bitset = make_char_bitset("0123456789");
 
     

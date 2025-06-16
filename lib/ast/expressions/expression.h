@@ -85,7 +85,7 @@ template<>
 struct ExpressionImpl<0> {
     std::variant<ptr<FunctionCallExpression>, ptr<StringLiteralExpression>,
     ptr<IntLiteralExpression>, ptr<IdentifierExpression>, ptr<ScopedExpression>,
-    ptr<ArrayExpression>, ptr<ArrayAccessExpression>, ptr<StdFuncCallExpression>
+    ptr<ArrayExpression>, ptr<ArrayAccessExpression>, ptr<ArraySliceExpression>, ptr<StdFuncCallExpression>
     > value;
 };
 
@@ -105,5 +105,12 @@ struct ArrayExpression {
 struct ArrayAccessExpression {
     ptr<ExpressionImpl<0>> array;
     std::vector<Expression> indices;
+};
+
+struct ArraySliceExpression {
+    ptr<ExpressionImpl<0>> array;
+    std::optional<Expression> start;
+    std::optional<Expression> end;
+    std::optional<Expression> step;
 };
 

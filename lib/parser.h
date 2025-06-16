@@ -101,7 +101,7 @@ struct Parser {
             ident->name = name;
             expr->value = ident;
             
-            // Handle function calls and array access
+            // Handle function calls and array access/slice
             while (cur_token_.type == TokenType::lparen || cur_token_.type == TokenType::lsquare) {
                 if (cur_token_.type == TokenType::lparen) {
                     logger_->log("Parsing function call");
@@ -119,21 +119,63 @@ struct Parser {
                     expr = make_ptr<ExpressionImpl<0>>();
                     expr->value = call;
                 } else if (cur_token_.type == TokenType::lsquare) {
-                    logger_->log("Parsing array access");
-                    auto access = make_ptr<ArrayAccessExpression>();
-                    
-                    // Create a new expression to hold the previous value
-                    ptr<ExpressionImpl<0>> array_expr = make_ptr<ExpressionImpl<0>>();
-                    array_expr->value = expr->value;  // Copy the previous value
-                    access->array = array_expr;       // Use the new expression
-                    
+                    logger_->log("Parsing array access or slice");
                     AdvanceTokens(); // skip [
-                    access->indices.push_back(ParseExpression());
-                    AdvanceTokens(); // skip ]
                     
-                    // Update expr with the new array access
-                    expr = make_ptr<ExpressionImpl<0>>();
-                    expr->value = access;
+                    if (cur_token_.type == TokenType::colon) {
+                        // Handle [:end] case
+                        auto slice = make_ptr<ArraySliceExpression>();
+                        slice->array = expr;
+                        AdvanceTokens(); // skip :
+                        
+                        if (cur_token_.type != TokenType::colon && cur_token_.type != TokenType::rsquare) {
+                            slice->end = ParseExpression();
+                        }
+                        
+                        if (cur_token_.type == TokenType::colon) {
+                            AdvanceTokens(); // skip :
+                            if (cur_token_.type != TokenType::rsquare) {
+                                slice->step = ParseExpression();
+                            }
+                        }
+                        
+                        AdvanceTokens(); // skip ]
+                        expr = make_ptr<ExpressionImpl<0>>();
+                        expr->value = slice;
+                    } else {
+                        // Check for slice with start value
+                        Expression index = ParseExpression();
+                        if (cur_token_.type == TokenType::colon) {
+                            // Handle [start:...] case
+                            auto slice = make_ptr<ArraySliceExpression>();
+                            slice->array = expr;
+                            slice->start = index;
+                            AdvanceTokens(); // skip :
+                            
+                            if (cur_token_.type != TokenType::colon && cur_token_.type != TokenType::rsquare) {
+                                slice->end = ParseExpression();
+                            }
+                            
+                            if (cur_token_.type == TokenType::colon) {
+                                AdvanceTokens(); // skip :
+                                if (cur_token_.type != TokenType::rsquare) {
+                                    slice->step = ParseExpression();
+                                }
+                            }
+                            
+                            AdvanceTokens(); // skip ]
+                            expr = make_ptr<ExpressionImpl<0>>();
+                            expr->value = slice;
+                        } else {
+                            // Regular array access
+                            auto access = make_ptr<ArrayAccessExpression>();
+                            access->array = expr;
+                            access->indices.push_back(index);
+                            AdvanceTokens(); // skip ]
+                            expr = make_ptr<ExpressionImpl<0>>();
+                            expr->value = access;
+                        }
+                    }
                 }
             }
             ans = expr;
@@ -157,6 +199,8 @@ struct Parser {
     std::optional<ptr<ElseStatement>> ParseElseStatement();
 private:
     std::vector<Expression> ParseArguments();
+    ptr<ExpressionImpl<0>> ParseArrayAccess(ptr<ExpressionImpl<0>> array);
+    ptr<ExpressionImpl<0>> ParseArraySlice(ptr<ExpressionImpl<0>> array, std::optional<Expression> start);
     std::unique_ptr<Lexer> lexer_;
     Token cur_token_;
     Token peek_token_;
