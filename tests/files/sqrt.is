@@ -1,0 +1,3 @@
+aboba = 9
+print(sqrt(aboba))
+print(sqrt(144))

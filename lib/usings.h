@@ -14,6 +14,12 @@ enum class BitOper {
     xor_ = 2,
 };
 
+enum class RoundingMode {
+    common,
+    floor,
+    ceil,
+};
+
 
 template<typename T>
 using ptr = std::shared_ptr<T>;

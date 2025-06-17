@@ -1,0 +1,5 @@
+aboba = 46
+print(to_string(aboba))
+print(to_string(4 + 5))
+print(to_string(3 * 2 + 1) + "ffff")
+print(parse_num(to_string(7*7) + "3") * 10)
