@@ -2,101 +2,147 @@
 #include "preprocess.h"
 #include "lexer_helpers.h"
 
-struct CommentEraser {
-    CommentEraser()
-     : last_symbol('\0'), erasing_block(false), erasing_line(false) 
-    {}
+class CommentEraser {
+public:
+    CommentEraser() : last_symbol('\0'), in_string(false) {}
+
     void Push(char symbol, std::string& ans) {
-        bool erasing = erasing_block || erasing_line;
-        Move(symbol);
-        last_symbol = symbol;
-        if (!erasing) {
+        if (symbol == '"') {
+            in_string = !in_string;
+            ans.push_back(symbol);
+            last_symbol = symbol;
+            return;
+        }
+
+        if (in_string) {
+            ans.push_back(symbol);
+            last_symbol = symbol;
+            return;
+        }
+
+        if (in_block_comment) {
+            if (symbol == '/' && last_symbol == '*') {
+                in_block_comment = false;
+                if (!ans.empty()) {
+                    ans.pop_back();
+                }
+            }
+            last_symbol = symbol;
+            return;
+        }
+
+        if (in_line_comment) {
+            if (symbol == '\n') {
+                in_line_comment = false;
+            }
+            last_symbol = symbol;
+            return;
+        }
+
+        if (last_symbol == '/') {
+            if (symbol == '/') {
+                in_line_comment = true;
+                if (!ans.empty()) {
+                    ans.pop_back();
+                }
+            } else if (symbol == '*') {
+                in_block_comment = true;
+                if (!ans.empty()) {
+                    ans.pop_back();
+                }
+            } else {
+                ans.push_back(symbol);
+            }
+        } else {
             ans.push_back(symbol);
         }
-    }
-    void Move(char symbol) {
-        if (erasing_block) {
-            if (symbol == '/' && last_symbol == '*') {
-                erasing_block = false;
-            }
-        } else if (erasing_line) {
-            if (symbol == '\n') {
-                erasing_line = false;
-            }
-        } else {
-            if (symbol == '*' && last_symbol == '/') {
-                erasing_block = true;
-            } else if (symbol == '/' && last_symbol == '/') {
-                erasing_line = true;
-            }
-        }
+
         last_symbol = symbol;
     }
+
+private:
     char last_symbol;
-    bool erasing_block;
-    bool erasing_line;
+    bool in_string;
+    bool in_block_comment{false};
+    bool in_line_comment{false};
 };
 
-std::string PreprocessWild(const std::string& code){
+std::string PreprocessWild(const std::string& code) {
     std::string ans;
     CommentEraser eraser;
-    for(const auto& c : code) {
-        if (c == ' ' || c == '\n') {
-            continue;
-        }
-        eraser.Push(c, ans);
-    }
-    return ans;
-}
+    bool last_was_space = false;
 
-std::string PreprocessNormal(const std::string& code){
-    std::string ans;
-    bool deleting = false;
-    CommentEraser eraser;
-    for(const auto& c : code) {
-        if (c == ' ' || c == '\n') {
-            if (deleting) {
-                continue;
-            } else {
-                deleting = true;
+    for (char c : code) {
+        if (std::isspace(c)) {
+            if (!last_was_space) {
                 eraser.Push(' ', ans);
+                last_was_space = true;
             }
         } else {
-            deleting = false;
+            last_was_space = false;
             eraser.Push(c, ans);
         }
     }
     return ans;
-    
 }
 
-std::string PreprocessWild(std::istream& in){
+std::string PreprocessNormal(const std::string& code) {
     std::string ans;
-    char buffer;
     CommentEraser eraser;
-    while (in.get(buffer)) {
-        
-        if (!is_whitespace(buffer)) {
-            eraser.Push(buffer, ans);
+    bool last_was_space = false;
+
+    for (char c : code) {
+        if (std::isspace(c)) {
+            if (!last_was_space) {
+                eraser.Push(' ', ans);
+                last_was_space = true;
+            }
+        } else {
+            last_was_space = false;
+            eraser.Push(c, ans);
         }
     }
     return ans;
 }
 
-std::string PreprocessNormal(std::istream& in){
+std::string PreprocessWild(std::istream& in) {
     std::string ans;
-    char buffer;
     CommentEraser eraser;
-    while (in.get(buffer)) {
-        if (!is_whitespace(buffer)) {
-            eraser.Push(buffer, ans);
-        } else {
-            eraser.Push(' ', ans);
-            while (in.get(buffer) && is_whitespace(buffer)) {}
-            if (!in.eof()) {
-                eraser.Push(buffer, ans);
+    bool last_was_space = false;
+    char c;
+
+    while (in.get(c)) {
+        if (std::isspace(c)) {
+            if (!last_was_space) {
+                eraser.Push(' ', ans);
+                last_was_space = true;
             }
+        } else {
+            last_was_space = false;
+            eraser.Push(c, ans);
         }
     }
+    return ans;
+}
+
+std::string PreprocessNormal(std::istream& in) {
+    std::string ans;
+    CommentEraser eraser;
+    bool last_was_space = false;
+    char c;
+
+    while (in.get(c)) {
+        if (std::isspace(c)) {
+            if (!last_was_space) {
+                eraser.Push(' ', ans);
+                last_was_space = true;
+            }
+        } else {
+            last_was_space = false;
+            eraser.Push(c, ans);
+        }
+    }
+    std::cout << "PreprocessNormal done\n";
+    std::cout << ans << std::endl;  
     return ans;
 }

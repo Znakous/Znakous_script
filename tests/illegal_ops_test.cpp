@@ -13,13 +13,13 @@ TEST(IllegalOperationsSuite, TypeMixing) {
         "123",
         "\"string\"",
         "[1, 2, 3]",
-        "function() end function",
+        "function() endfunction",
         "nil",
     };
 
     for (int a = 0; a < values.size(); ++a) {
         for (int b = a + 1; b < values.size(); ++b) {
-            std::istringstream input;
+            std::stringstream input;
             input << "a = " << values[a] << "\n";
             input << "b = " << values[b] << "\n";
             input << "c = a + b" << "\n";
@@ -36,9 +36,9 @@ TEST(IllegalOperationsSuite, TypeMixing) {
 
 TEST(IllegalOperationsSuite, ArgumentCountMismatch) {
     std::string code = R"(
-        func = function(value) return 1 end function
+        func = function(value) return 1 endfunction
 
-        func(1, 2)
+        func(1, 2, 654)
 
         print(239) // unreachable
     )";

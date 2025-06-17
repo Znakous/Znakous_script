@@ -31,6 +31,7 @@ endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 include_directories(lib)
+include_directories(build)
 add_subdirectory(lib)
 add_subdirectory(bin)
 

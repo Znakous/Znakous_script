@@ -5,12 +5,12 @@
 #include <iostream>
 #include <functional>
 
-#include <object.h>
-#include "std_func_include.h"
+#include "object.h"
+#include "base_std.h"
 
 
-struct Abs {
-    Abs() : out(std::cout) {}
+struct Abs : BaseStd {
+    Abs() : BaseStd(std::cout) {}
     Abs(std::ostream& out, std::vector<Object>&& args);
     ~Abs() = default;
     template<typename T>
@@ -23,6 +23,4 @@ struct Abs {
 
     Object Execute();
     
-    std::vector<Object> args;
-    std::reference_wrapper<std::ostream> out;
 };

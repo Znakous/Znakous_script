@@ -1,0 +1,2 @@
+aboba = rnd(4, 90)
+print(aboba - aboba)

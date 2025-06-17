@@ -2,7 +2,7 @@
 
 
 Print::Print(std::ostream& out, std::vector<Object>&& args_)
-    : out(out), args(std::move(args_))
+    : BaseStd(out, std::move(args_))
 {}
 
 void Print::operator()(CArray& a) {
@@ -22,5 +22,5 @@ Object Print::Execute() {
     for (auto& arg : args) {
         std::visit(*this, arg);
     }
-    return args[0];
+    return CNull{};
 }

@@ -19,26 +19,13 @@ file(GLOB_RECURSE TEST_SOURCES
 
 add_executable(
   itmoscript_tests
-  # trie_tests.cpp
-  # lexer_tests.cpp
-  # parser_tests.cpp
-  # interpreter_tests.cpp
-  # function_test.cpp
-  # types_test.cpp
   # loop_and_branch_test.cpp
-  # inerpreter_tests/simplests_tests.cpp
-  # inerpreter_tests/cycles_tests.cpp
-  # inerpreter_tests/arrays_tests.cpp
-  # inerpreter_tests/weirdos_tests.cpp
-  # inerpreter_tests/strings_tests.cpp
-  # inerpreter_tests/usage_scenarios_tests.cpp
-  # inerpreter_tests/non_wild_tests.cpp
-  # inerpreter_tests/wild_tests.cpp
-  inerpreter_tests/operators_tests.cpp
-  # inerpreter_tests/real_programs_tests.cpp
-  # inerpreter_tests/slices_tests.cpp
+  # files_tests.cpp
   # inerpreter_tests/interpreter_tests.cpp
-  files_tests.cpp
+  ${TEST_SOURCES}
+  # inerpreter_tests/non_wild_tests.cpp
+  # inerpreter_tests/strings_tests.cpp
+  # illegal_ops_test.cpp
 )
 
 target_link_libraries(

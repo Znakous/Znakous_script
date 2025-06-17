@@ -4,12 +4,12 @@
 #include <iostream>
 #include <functional>
 
-#include <object.h>
-#include "std_func_include.h"
+#include "object.h"
+#include "base_std.h"
 
 
-struct ParseNum {
-    ParseNum() : out(std::cout) {}
+struct ParseNum : BaseStd {
+    ParseNum() : BaseStd(std::cout) {}
     ParseNum(std::ostream&, std::vector<Object>&&);
     ~ParseNum() = default;
     template<typename O>
@@ -20,6 +20,4 @@ struct ParseNum {
     Object operator()(std::string& o);
     Object Execute();
     
-    std::vector<Object> args;
-    std::reference_wrapper<std::ostream> out;
 };

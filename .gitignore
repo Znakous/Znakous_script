@@ -32,6 +32,9 @@
 *.app
 
 
+*.bat
+
+
 build/
 .vscode/
 

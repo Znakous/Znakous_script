@@ -1,7 +1,7 @@
 #include "abs.h"
 
 Abs::Abs(std::ostream& out, std::vector<Object>&& args_)
-    : out(out), args(std::move(args_))
+    : BaseStd(out, std::move(args_))
 {}
 
 Object Abs::operator()(double a) {

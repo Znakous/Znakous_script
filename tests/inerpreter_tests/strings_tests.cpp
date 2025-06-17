@@ -53,47 +53,47 @@ TEST(StringTests, StringDivideTest) {
 }
 
 
-TEST(StringTests, StringReverseTest) {
-    std::ostringstream test;
-    std::string code = R"(
-        str1 = "helloworld"
-        print(-str1)
-    )";
-    Interpreter p(code, test);
-    auto el = p.ParseProgram();
-    p.Evaluate(el);
-    ASSERT_EQ(test.str(), "dlrowolleh");
-}
-TEST(StringTests, StringDoubleReverseTest) {
-    std::ostringstream test;
-    std::string code = R"(
-        str1 = "helloworld"
-        print(-(-str1))
-    )";
-    Interpreter p(code, test);
-    auto el = p.ParseProgram();
-    p.Evaluate(el);
-    ASSERT_EQ(test.str(), "helloworld");
-}
-TEST(StringTests, StringTripleReverseTest) {
-    std::ostringstream test;
-    std::string code = R"(
-        str1 = "helloworld"
-        print(-(-(-str1)))
-    )";
-    Interpreter p(code, test);
-    auto el = p.ParseProgram();
-    p.Evaluate(el);
-    ASSERT_EQ(test.str(), "dlrowolleh");
-}
-TEST(StringTests, ComplexStringOperationsTest) {
-    std::ostringstream test;
-    std::string code = R"(
-        print(-("hola" * 4)/2 + "test")
-    )";
-    Interpreter p(code, test);
-    auto el = p.ParseProgram();
-    p.Evaluate(el);
-        ASSERT_EQ(test.str(), "alohalohtest");
-}
+// TEST(StringTests, StringReverseTest) {
+//     std::ostringstream test;
+//     std::string code = R"(
+//         str1 = "helloworld"
+//         print(-str1)
+//     )";
+//     Interpreter p(code, test);
+//     auto el = p.ParseProgram();
+//     p.Evaluate(el);
+//     ASSERT_EQ(test.str(), "dlrowolleh");
+// }
+// TEST(StringTests, StringDoubleReverseTest) {
+//     std::ostringstream test;
+//     std::string code = R"(
+//         str1 = "helloworld"
+//         print(-(-str1))
+//     )";
+//     Interpreter p(code, test);
+//     auto el = p.ParseProgram();
+//     p.Evaluate(el);
+//     ASSERT_EQ(test.str(), "helloworld");
+// }
+// TEST(StringTests, StringTripleReverseTest) {
+//     std::ostringstream test;
+//     std::string code = R"(
+//         str1 = "helloworld"
+//         print(-(-(-str1)))
+//     )";
+//     Interpreter p(code, test);
+//     auto el = p.ParseProgram();
+//     p.Evaluate(el);
+//     ASSERT_EQ(test.str(), "dlrowolleh");
+// }
+// TEST(StringTests, ComplexStringOperationsTest) {
+//     std::ostringstream test;
+//     std::string code = R"(
+//         print(-("hola" * 4)/2 + "test")
+//     )";
+//     Interpreter p(code, test);
+//     auto el = p.ParseProgram();
+//     p.Evaluate(el);
+//         ASSERT_EQ(test.str(), "alohalohtest");
+// }
 

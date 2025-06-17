@@ -82,9 +82,12 @@ struct Environment {
     }
 
     void SetHere(std::string_view ident, Object value) {
+        logger_->log("Setting here ident: ", ident);
         if (HasHere(ident)) {
+            logger_->log("Ident found in here, setting");
             namespc_->get_nocheck(ident.data()) = value;
         } else {
+            logger_->log("Ident not found in here, declaring");
             Declare(ident, true);
             namespc_->insert(ident, value);
         }

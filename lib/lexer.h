@@ -13,6 +13,7 @@
 class Lexer {
 public:
     Lexer(std::string&& data, std::shared_ptr<logging::Logger> logger);
+    virtual ~Lexer() = default;
     bool IsIdentSymbol();
     virtual void ReadOne() = 0;
     Token PeekToken();

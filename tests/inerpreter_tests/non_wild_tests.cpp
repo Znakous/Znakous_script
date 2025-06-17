@@ -5,8 +5,8 @@
 
 TEST(NonWildTests, PriorityAndIfTest) {
     std::ostringstream test;
-    std::string code = R"(aboba=7+8+(10*3) aboba = aboba + 2 if 0 then aboba = 3 - aboba else aboba = aboba + 1 endif pr = print(aboba))";
-    Interpreter p(code, test, true);
+    std::string code = R"(aboba=7+8+(10*3) aboba = aboba + 2 if 0 then aboba = 3 - aboba else aboba = aboba + 1 endif print(aboba))";
+    Interpreter p(code, test);
     auto el = p.ParseProgram();
     p.Evaluate(el);
     ASSERT_EQ(test.str(), "48");
@@ -33,5 +33,5 @@ TEST(NonWildTests, SimpleFunctionTest) {
     Interpreter p(code, test, false);
     auto el = p.ParseProgram();
     p.Evaluate(el);
-    ASSERT_EQ(test  .str(), "3");
+    ASSERT_EQ(test.str(), "3");
 }

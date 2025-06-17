@@ -15,6 +15,7 @@ Lexer::Lexer(std::string&& data, std::shared_ptr<logging::Logger> logger)
 }
 
 void WildLexer::ReadOne() {
+    std::cout << "ReadOne\n";
     if (str_.data()[read_pos_] == '\0') {
         derived_size = read_pos_;
         cur_char_ = 0;
@@ -71,6 +72,7 @@ void Lexer::FindNumber(bool met_e=false, bool e_was_last=false) {
 }
 
 TokenType Lexer::GetFunnyAssign(std::string_view op) {
+    std::cout << "GetFunnyAssign\n";
     auto resp = keywords_.get(op.data());
     if (resp.has_value()) {
         return resp.value().param.type;
@@ -166,6 +168,7 @@ Token NormalLexer::NextToken() {
         else {
             std::cout << "declare new ident " << ident << std::endl;
             identifiers_.insert(ident, Token(TokenType::ident, ident));
+            std::cout << "inserted\n";
             return Token(TokenType::ident, ident);
         } 
         // else {
@@ -221,6 +224,7 @@ Token NormalLexer::NextToken() {
 }
 
 std::string_view NormalLexer::GetIdent() {
+    std::cout << "GetIdent\n";
     uint32_t first_let = cur_pos_;
     if (is_forbidden_startchar(cur_char_)) {
         return std::string_view();
@@ -228,6 +232,7 @@ std::string_view NormalLexer::GetIdent() {
     while(cur_char_ != 0 && !is_forbidden_char(cur_char_)) {
         ReadOne();
     }
+    std::cout << "GetIdent done\n";
     return std::string_view(str_.data() + first_let, str_.data() + cur_pos_);
 }
 

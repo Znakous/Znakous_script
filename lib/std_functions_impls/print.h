@@ -3,11 +3,11 @@
 #include <vector>
 #include <iostream>
 #include <functional>
-#include <object.h>
-#include "std_func_include.h"
+#include "object.h"
+#include "base_std.h"
 
-struct Print {
-    Print() : out(std::cout) {}
+struct Print : BaseStd {
+    Print() : BaseStd(std::cout) {}
     Print(std::ostream& out, std::vector<Object>&& args);
     
     ~Print() = default;
@@ -19,6 +19,4 @@ struct Print {
     void operator()(StdFuncPtr& a);
     Object Execute();
     
-    std::vector<Object> args;
-    std::reference_wrapper<std::ostream> out;
 };

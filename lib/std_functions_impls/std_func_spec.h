@@ -3,7 +3,7 @@
 
 #include "trie.h"
 #include "std_func_include.h"
-#include "../build/std_func_all.h"
+#include <build/std_func_all.h>
 
 using StdFuncVar = std::variant<functions>;
 

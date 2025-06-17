@@ -26,7 +26,8 @@ TEST(FilesTests, InterpretFiles) {
             std::string expected_output((std::istreambuf_iterator<char>(expected_stream)),
                                       std::istreambuf_iterator<char>());
             std::string actual_output = output.str();
-            
+            std::cout << "Expected:\n" << expected_output << "\n"
+                << "Actual:\n" << actual_output;
             // expected_output.erase(std::remove(expected_output.begin(), expected_output.end(), '\r'), expected_output.end());
             // actual_output.erase(std::remove(actual_output.begin(), actual_output.end(), '\r'), actual_output.end());
             

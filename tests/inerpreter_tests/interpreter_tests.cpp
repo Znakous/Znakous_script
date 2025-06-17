@@ -7,15 +7,15 @@
 
 TEST(ClosureTests, EarlyReturnAndClosureTest) {
     std::ostringstream test;
-    std::string code = R"(aboba=function(n) 
+    std::string code = R"(aboba=function+(n) 
                         sd = 13 
                         if (n) then 
-                            return function(g) return g + 1 endfunction 
+                            return function+(g) return g + 1 endfunction 
                         else 
                             sd = 11
                         endif 
                         ll = print(sd)
-                        return function(zzz) return zzz + sd endfunction
+                        return function+(zzz) return zzz + sd endfunction
                         endfunction 
                         rt = 5 
                         fr = aboba(3) 
@@ -33,9 +33,9 @@ TEST(ClosureTests, EarlyReturnAndClosureTest) {
 TEST(ClosureTests, NestedClosureTest) {
     std::ostringstream test;
     std::string code = R"(
-        counter = function(start)
+        counter = function+(start)
             count = start
-            return function(i)
+            return function+(i)
                 chipi = count + i
                 return chipi
             endfunction
@@ -43,9 +43,9 @@ TEST(ClosureTests, NestedClosureTest) {
         
         c1 = counter(10)
         c2 = c1(1)
-        c3 = c1(2)
+        d = c1(2)
         r1 = print(c2)
-        r2 = print(c3)
+        r2 = print(d)
     )";
     Interpreter p(code, test);
     auto el = p.ParseProgram();
@@ -56,8 +56,8 @@ TEST(ClosureTests, NestedClosureTest) {
 TEST(ClosureTests, ClosureRecursionTest) {
     std::ostringstream test;
     std::string code = R"(
-        makeFactorial = function(m)
-            factorial = function(n)
+        makeFactorial = function+(m)
+            factorial = function+(n)
                 if n then
                     return n * factorial(n - 1)
                 else

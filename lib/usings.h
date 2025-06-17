@@ -5,8 +5,14 @@
 #include <functional>
 
 
-constexpr size_t operators_levels = 5;
+constexpr size_t operators_levels = 6;
 
+
+enum class BitOper {
+    and_ = 0,
+    or_ = 1,
+    xor_ = 2,
+};
 
 
 template<typename T>

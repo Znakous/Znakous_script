@@ -37,6 +37,11 @@ bool IsLevelOperator<5>(Token token) {
         || (token.type == TokenType::eq) || (token.type == TokenType::neq);
 }
 
+template<>
+bool IsLevelOperator<6>(Token token) {
+    return (token.type == TokenType::bit_and) || (token.type == TokenType::bit_or)
+        || (token.type == TokenType::bit_xor);
+}
 
 // TokenType GetFunnyAssign(std::string_view op) {
 //     if (op == "+") return TokenType::plus;

@@ -1,7 +1,7 @@
 #include <lib/interpreter.h>
 #include <gtest/gtest.h>
 
-TEST(FunctionTestSuite, SimpleFunctionTest) {
+TEST(FunctionTests, SimpleFunctionTest) {
     std::string code = R"(
         incr = function(value)
             return value + 1
@@ -14,7 +14,7 @@ TEST(FunctionTestSuite, SimpleFunctionTest) {
     std::string expected = "3";
 
     std::istringstream input(code);
-    std::ostringstream output;
+    std::ostringstream test;
 
     Interpreter p(code, test, false);
     auto el = p.ParseProgram();

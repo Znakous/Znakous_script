@@ -79,14 +79,6 @@ struct AddVisitor : BinaryOperVisitor {
         logger_->log("Adding strings: ", a, " + ", b);
         return std::string(a) + b;  
     }
-    Object operator()(const double& a, const std::string& b) {
-        logger_->log("Adding double to string: ", a, " + ", b);
-        return std::to_string(a) + b;
-    }
-    Object operator()(const std::string& a, const double& b) {
-        logger_->log("Adding string to double: ", a, " + ", b);
-        return a + std::to_string(b);
-    }
     template<typename T, typename U>
     Object operator()(const T& t, const U& u) { 
         logger_->log("Invalid addition between types: ", typeid(T).name(), " and ", typeid(U).name());
@@ -371,5 +363,33 @@ struct ModVisitor : BinaryOperVisitor {
     Object operator()(const T& t, const U& u) { 
         logger_->log("Invalid modulo operation between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation modulo");
+    }
+};
+
+template<BitOper oper>
+struct BitOperVisitor : BinaryOperVisitor {
+    using BinaryOperVisitor::BinaryOperVisitor;
+    virtual Object operator()(Object& a, Object& b) override {
+        logger_->log("Computing bit operation between types: ", typeid(a).name(), " and ", typeid(b).name());
+        return std::visit(*this, a, b);
+    }
+    Object operator()(const double& a_double, const double& b_double) {
+        int64_t a = static_cast<int64_t>(a_double);
+        int64_t b = static_cast<int64_t>(b_double);
+        if constexpr (oper == BitOper::and_) {
+            // logger_->log("Computing bit operation: ", a, " ", oper, " ", b);
+            return static_cast<double>(a & b);
+        } else if constexpr (oper == BitOper::or_) {
+            // logger_->log("Computing bit operation: ", a, " ", oper, " ", b);
+            return static_cast<double>(a | b);
+        } else if constexpr (oper == BitOper::xor_) {
+            // logger_->log("Computing bit operation: ", a, " ", oper, " ", b);
+            return static_cast<double>(a ^ b);
+        }
+        throw std::runtime_error("Invalid bit operation");
+    }
+    template<typename T, typename U>
+    Object operator()(const T& t, const U& u) {
+        throw std::runtime_error("Invalid operation bit");
     }
 };

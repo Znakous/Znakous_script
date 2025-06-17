@@ -154,6 +154,11 @@ Expression Parser::ParseExpression() {
         AdvanceTokens(); // skip func
 
         ptr<FunctionalExpression> ans = make_ptr<FunctionalExpression>();
+        if (cur_token_.type == TokenType::plus) {
+            ans->is_closure = true;
+            AdvanceTokens(); // skip +  
+        }
+        
         logger_->log("Parsing function arguments");
 
         AdvanceTokens(); // skip (

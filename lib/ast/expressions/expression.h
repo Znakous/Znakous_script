@@ -96,6 +96,7 @@ struct FunctionalExpression {
     std::vector<Statement> body;
     std::vector<std::string_view> arguments;
     ptr<Environment> closure_env;
+    bool is_closure=false;
 };
 
 

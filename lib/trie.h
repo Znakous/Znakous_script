@@ -132,6 +132,7 @@ public:
         } else {
             // std::cout << "unresolved\n";
         }
+        throw std::runtime_error("Trie::get_nocheck: word not found");
         // pupupu
     }
 };

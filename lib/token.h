@@ -30,7 +30,8 @@ enum class TokenType {
     colon,
     slice_access,
     power,
-    funny_assign, null
+    funny_assign, null,
+    bit_and, bit_or, bit_xor,
 };
 
 
@@ -73,12 +74,18 @@ constexpr std::pair<std::string_view, Token> keywords[] = {
     {"/=", {TokenType::funny_assign, "/"}},
     {"%=", {TokenType::funny_assign, "%"}},
     {"^=", {TokenType::funny_assign, "^"}},
+    {"&=", {TokenType::funny_assign, "&"}},
+    {"|=", {TokenType::funny_assign, "|"}},
+    {"`=", {TokenType::funny_assign, "`"}},
     {"+", {TokenType::plus, std::nullopt}},
     {"-", {TokenType::minus, std::nullopt}},
     {"*", {TokenType::multiply, std::nullopt}},
     {"/", {TokenType::divide, std::nullopt}},
     {"%", {TokenType::mod, std::nullopt}},
     {"^", {TokenType::power, std::nullopt}},
+    {"&", {TokenType::bit_and, std::nullopt}},
+    {"|", {TokenType::bit_or, std::nullopt}},
+    {"`", {TokenType::bit_xor, std::nullopt}},
     {"==", {TokenType::eq, std::nullopt}},
     {"<", {TokenType::less, std::nullopt}},
     {">", {TokenType::greater, std::nullopt}},
@@ -115,5 +122,7 @@ bool IsLevelOperator<4>(Token token);
 template<>
 bool IsLevelOperator<5>(Token token);
 
+template<>
+bool IsLevelOperator<6>(Token token);
 
 // TokenType GetFunnyAssign(std::string_view op);

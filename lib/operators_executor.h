@@ -15,18 +15,23 @@ struct BinaryOperatorExecutor {
     BinaryOperatorExecutor(std::shared_ptr<logging::Logger> log)
      : logger_(log)
     {
-        visitors.emplace(TokenType::plus, std::make_unique<AddVisitor>(log));
-        visitors.emplace(TokenType::minus, std::make_unique<SubVisitor>(log));
-        visitors.emplace(TokenType::multiply, std::make_unique<MultVisitor>(log));
-        visitors.emplace(TokenType::divide, std::make_unique<DivideVisitor>(log));
-        visitors.emplace(TokenType::eq, std::make_unique<EqVisitor>(log));
-        visitors.emplace(TokenType::neq, std::make_unique<NeqVisitor>(log));
-        visitors.emplace(TokenType::less, std::make_unique<LessVisitor>(log));
-        visitors.emplace(TokenType::greater, std::make_unique<GreaterVisitor>(log));
-        visitors.emplace(TokenType::leq, std::make_unique<LeqVisitor>(log));
-        visitors.emplace(TokenType::geq, std::make_unique<GeqVisitor>(log));
-        visitors.emplace(TokenType::mod, std::make_unique<ModVisitor>(log));
-        visitors.emplace(TokenType::power, std::make_unique<PowerVisitor>(log));
+        #define ADD_VISITOR(oper, visitor) visitors.emplace(TokenType::oper, std::make_unique<visitor>(log))
+        ADD_VISITOR(plus, AddVisitor);
+        ADD_VISITOR(minus, SubVisitor);
+        ADD_VISITOR(multiply, MultVisitor);
+        ADD_VISITOR(divide, DivideVisitor);
+        ADD_VISITOR(eq, EqVisitor);
+        ADD_VISITOR(neq, NeqVisitor);
+        ADD_VISITOR(less, LessVisitor);
+        ADD_VISITOR(greater, GreaterVisitor);
+        ADD_VISITOR(leq, LeqVisitor);
+        ADD_VISITOR(geq, GeqVisitor);
+        ADD_VISITOR(mod, ModVisitor);
+        ADD_VISITOR(power, PowerVisitor);
+        ADD_VISITOR(bit_and, BitOperVisitor<BitOper::and_>);
+        ADD_VISITOR(bit_or, BitOperVisitor<BitOper::or_>);
+        ADD_VISITOR(bit_xor, BitOperVisitor<BitOper::xor_>);
+        #undef ADD_VISITOR
     }
 
     Object Execute(TokenType oper, Object& a, Object& b) {
@@ -45,7 +50,9 @@ struct UnaryOperatorExecutor {
     UnaryOperatorExecutor(std::shared_ptr<logging::Logger> log)
      : logger_(log)
     {
-        visitors.emplace(TokenType::minus, std::make_unique<UnaryMinusVisitor>(log));
+        #define ADD_VISITOR(oper, visitor) visitors.emplace(TokenType::oper, std::make_unique<visitor>(log))
+        ADD_VISITOR(minus, UnaryMinusVisitor);
+        #undef ADD_VISITOR
     }
 
     Object Execute(TokenType oper, Object& a) {

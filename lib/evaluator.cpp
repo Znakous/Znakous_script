@@ -125,16 +125,22 @@ Object Evaluator::operator()(ptr<FunctionCallExpression>& expr) {
     ptr<FunctionalExpression> to_invoke = std::get<ptr<FunctionalExpression>>(function);
     logger_->log("Function resolved, preparing to invoke");
     
+    std::vector<Object> args;
+    for (auto& arg : expr->arguments) {  // Process all provided arguments
+        args.push_back(std::visit(*this, arg));
+    }
+
     env_.Enclose();
-    
-    // if (to_invoke->closure_env) {
-    //     env_.current->CopyFrom(*to_invoke->closure_env);
-    // }
-    
+    if (to_invoke->is_closure) {
+        env_.current->CopyFrom(*to_invoke->closure_env);
+    }
+    if (args.size() != to_invoke->arguments.size()) {
+        throw std::runtime_error("Function call has wrong number of arguments: expected " + 
+            std::to_string(to_invoke->arguments.size()) + ", got " + std::to_string(args.size()));
+    }
     for (int i = 0; i < to_invoke->arguments.size(); ++i) {
         logger_->log("Processing argument: ", to_invoke->arguments[i]);
-        // env_.current->Declare(to_invoke->arguments[i], true);
-        env_.current->SetHere(to_invoke->arguments[i], std::visit(*this, expr->arguments[i]));
+        env_.current->SetHere(to_invoke->arguments[i], args[i]);
     }
     
     for (decltype(auto) st : to_invoke->body) {
