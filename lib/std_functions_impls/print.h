@@ -1,3 +1,5 @@
+// add: Print
+
 #pragma once
 
 #include <vector>
@@ -13,10 +15,11 @@ struct Print : BaseStd {
     ~Print() = default;
     template<typename T>
     void operator()(T& a) {
-        out.get() << a;
+        out->get() << a;
     };
     void operator()(CArray& a);
     void operator()(StdFuncPtr& a);
     Object Execute();
     
+    static constexpr std::string_view name = "print";
 };

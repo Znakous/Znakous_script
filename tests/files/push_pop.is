@@ -1,0 +1,4 @@
+d = [1, 2, 3]
+d = pop(d)
+d = push(d, 6)
+print(d)

@@ -70,5 +70,13 @@ struct BreakStatement {};
 
 struct ContinueStatement {};
 
+struct ForInStatement {
+    std::string_view ident;
+    Expression range;
+    std::vector<Statement> body;
+};
+
+
+
 
 

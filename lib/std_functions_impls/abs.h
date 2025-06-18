@@ -1,3 +1,4 @@
+// add: Abs
 #pragma once
 
 #include <cmath>
@@ -23,4 +24,5 @@ struct Abs : BaseStd {
 
     Object Execute();
     
+    static constexpr std::string_view name = "abs";
 };

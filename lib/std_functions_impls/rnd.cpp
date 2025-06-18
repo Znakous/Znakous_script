@@ -1,8 +1,6 @@
 #include "rnd.h"
 
-Rnd::Rnd(std::ostream& out, std::vector<Object>&& args_)
-    : out(out), args(std::move(args_)), rng(std::random_device{}()) 
-{}
+
 
 Object Rnd::operator()(double& a, double& b) {
     if (b <= 0) {

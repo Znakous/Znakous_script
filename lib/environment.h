@@ -101,9 +101,6 @@ struct Environment {
                 return parent_->operator[](ident);
             }
         }
-        // if (resp.value().size != ident.size()) {
-        //     return std::nullopt;
-        // }
         return namespc_->get_nocheck(ident.data());
     }
 

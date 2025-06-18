@@ -1,0 +1,2 @@
+print(lower("GTR"))
+print(upper("pupUpu"))

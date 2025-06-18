@@ -60,9 +60,12 @@ Statement Parser::ParseStatement() {
             logger_->log("Found continue statement");
             AdvanceTokens();
             return make_ptr<ContinueStatement>();
+        } else if (cur_token_.type == TokenType::for_s) {
+            logger_->log("Found for in statement");
+            return ParseForInStatement();
         } else {
             return ParseAssignStatement();
-        }
+        } 
     }
     
     logger_->log("Invalid statement encountered");
@@ -113,15 +116,12 @@ Statement Parser::ParseAssignStatement() {
         logger_->log("Funny assign: ", static_cast<int>(ans->funny_assign.value()));
         AdvanceTokens();
         
-        // Parse the right-hand side expression
         Expression rhs = ParseExpression();
         
-        // Create a new identifier expression for the left side
         auto id_expr = make_ptr<ExpressionImpl<0>>();
         id_expr->value = make_ptr<IdentifierExpression>();
         std::get<ptr<IdentifierExpression>>(id_expr->value)->name = ident;
         
-        // Create the binary operation at level 3
         
         ans->expr = rhs;
     } else {
@@ -213,6 +213,34 @@ ptr<WhileStatement> Parser::ParseWhileStatement() {
     
     AdvanceTokens();
     logger_->log("While statement parsing completed");
+    return ans;
+}
+
+ptr<ForInStatement> Parser::ParseForInStatement() {
+    logger_->log("Parsing for in statement");
+    ptr<ForInStatement> ans = make_ptr<ForInStatement>();
+    AdvanceTokens(); // skip for
+
+    if (cur_token_.type != TokenType::ident) {
+        logger_->log("Error: missing identifier");
+    }
+
+    ans->ident = cur_token_.value.value();
+    AdvanceTokens(); // skip ident
+
+    if (cur_token_.type != TokenType::in_s) {
+        logger_->log("Error: missing 'in' keyword");
+    }
+
+    AdvanceTokens(); // skip in
+
+    ans->range = ParseExpression();
+
+    while (cur_token_.type != TokenType::endfor) {
+        ans->body.push_back(ParseStatement());
+    }
+
+    AdvanceTokens(); // skip endfor
     return ans;
 }
 

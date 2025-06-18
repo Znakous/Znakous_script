@@ -13,7 +13,8 @@ TEST(SimplestTests, PriorityAndIfTest) {
 }
 TEST(SimplestTests, FuncTest) {
     std::string code = R"(aboba=function(n, m) return function(g) return g + 1 endfunction endfunction rt = 5 fr = aboba(3, rt) uk = fr(56))";
-    Interpreter p(code, std::cout);
+    std::ostringstream out;
+    Interpreter p(code, out);
     auto el = p.ParseProgram();
     p.Evaluate(el);
 }

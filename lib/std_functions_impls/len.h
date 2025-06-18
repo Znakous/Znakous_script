@@ -1,3 +1,5 @@
+// add: Len
+
 #pragma once
 
 #include "base_std.h"
@@ -16,5 +18,6 @@ struct Len : BaseStd {
     Object operator()(std::string& a);
     Object operator()(CArray& a);
     Object Execute();
+    static constexpr std::string_view name = "len";
 };
 

@@ -1,3 +1,5 @@
+// add: Rnd
+
 #pragma once
 
 #include <vector>
@@ -6,9 +8,10 @@
 #include <random>
 #include <object.h>
 #include "std_func_include.h"
+#include "base_std.h"
 
-struct Rnd {
-    Rnd() : out(std::cout), rng(std::random_device{}()) {}
+struct Rnd : BaseStd {
+    Rnd() : rng(std::random_device{}()) {}
     Rnd(std::ostream& out, std::vector<Object>&& args);
     ~Rnd() = default;
 
@@ -20,9 +23,8 @@ struct Rnd {
 
     Object operator()(double& a, double& b);
     Object Execute();
-    
-    std::vector<Object> args;
-    std::reference_wrapper<std::ostream> out;
+
+    static constexpr std::string_view name = "rnd";
 private:
     std::mt19937 rng; 
 };

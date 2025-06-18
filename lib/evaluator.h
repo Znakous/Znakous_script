@@ -76,7 +76,7 @@ struct Evaluator {
         logger_->log("Evaluating continue statement");
         return Stopping::continue_s; 
     }
-
+    Stopping operator()(ptr<ForInStatement>& expr);
     Object operator()(ptr<IntLiteralExpression>& expr);
     Object operator()(ptr<StringLiteralExpression>& expr);
     Object operator()(ptr<NullLiteralExpression>& expr);

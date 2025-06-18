@@ -1,3 +1,5 @@
+// add: ParseNum
+
 #pragma once
 
 #include <vector>
@@ -19,5 +21,5 @@ struct ParseNum : BaseStd {
     }
     Object operator()(std::string& o);
     Object Execute();
-    
+    static constexpr std::string_view name = "parse_num";
 };

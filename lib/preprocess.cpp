@@ -142,7 +142,5 @@ std::string PreprocessNormal(std::istream& in) {
             eraser.Push(c, ans);
         }
     }
-    std::cout << "PreprocessNormal done\n";
-    std::cout << ans << std::endl;  
     return ans;
 }

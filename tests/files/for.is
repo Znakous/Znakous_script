@@ -1,0 +1,5 @@
+aboba = [1, 2, 3]
+for i in aboba
+    print(i)
+endfor
+print("ggg")

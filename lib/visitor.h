@@ -67,6 +67,7 @@ struct UnaryMinusVisitor : UnaryOperVisitor {
 
 struct AddVisitor : BinaryOperVisitor {
     using BinaryOperVisitor::BinaryOperVisitor;
+    AddVisitor() : BinaryOperVisitor(make_ptr<logging::Logger>()) {}
     virtual Object operator()(Object& a, Object& b) override {
         logger_->log("Adding types: ", typeid(a).name(), " and ", typeid(b).name());
         return std::visit(*this, a, b);
@@ -204,7 +205,10 @@ struct NeqVisitor : BinaryOperVisitor {
 };
 
 struct LessVisitor : BinaryOperVisitor {
-    using BinaryOperVisitor::BinaryOperVisitor;
+    LessVisitor() : BinaryOperVisitor(make_ptr<logging::Logger>()) {}
+    LessVisitor(std::shared_ptr<logging::Logger> log)
+     : BinaryOperVisitor(log) 
+    {}
     virtual Object operator()(Object& a, Object& b) override {
         logger_->log("Comparing types: ", typeid(a).name(), " and ", typeid(b).name());
         return std::visit(*this, a, b);

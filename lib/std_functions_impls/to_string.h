@@ -1,3 +1,5 @@
+// add: ToString
+
 #pragma once
 
 #include "std_func_include.h"
@@ -18,5 +20,6 @@ struct ToString : BaseStd {
     }
 
     Object operator()(double& arg);
+    static constexpr std::string_view name = "to_string";
 };
 

@@ -1,0 +1,2 @@
+a = "aboba"
+print(replace(a, "a", "f"))

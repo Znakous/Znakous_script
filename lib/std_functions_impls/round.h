@@ -1,3 +1,7 @@
+// add: Round<RoundingMode::floor>
+// add: Round<RoundingMode::ceil>
+// add: Round<RoundingMode::common>
+
 #pragma once
 
 #include "std_func_include.h"
@@ -31,5 +35,15 @@ struct Round : BaseStd {
             throw std::runtime_error("Invalid rounding mode");
         }
     }
+    static constexpr std::string_view name;
 };
+
+template<>
+constexpr std::string_view Round<RoundingMode::common>::name = "round";
+template<>
+constexpr std::string_view Round<RoundingMode::floor>::name = "floor";
+template<>
+constexpr std::string_view Round<RoundingMode::ceil>::name = "ceil";
+
+
 

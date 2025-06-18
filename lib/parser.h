@@ -200,7 +200,7 @@ struct Parser {
 
     ptr<ReturnStatement> ParseReturnStatement();
     ptr<IfStatement> ParseIfStatement();
-
+    ptr<ForInStatement> ParseForInStatement();
     std::optional<ptr<ElseIfStatement>> ParseElseIfs();
     std::optional<ptr<ElseStatement>> ParseElseStatement();
 private:

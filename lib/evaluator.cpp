@@ -3,13 +3,6 @@
 #include "logger.h"
 
 double stoi_view(std::string_view s) {
-    // int ans = 0;
-    // if (std::from_chars(s.data(), s.data() + s.size(), ans).ec
-    //         == std::errc::invalid_argument) {
-    //     throw std::invalid_argument("invalid stoi_view argument");
-    // } 
-    // std::cout << "stoi_view: " <<  << " " << s << "\n";
-    // throw std::runtime_error("stoi_view: " + std::to_string(ans));
     return std::stod(s.data(), nullptr);
 }
 
@@ -111,6 +104,7 @@ Object Evaluator::operator()(ptr<StdFuncCallExpression>& expr) {
     std::vector<Object> args;
     for (auto& arg : expr->arguments) {
         args.push_back(std::visit(*this, arg));
+        std::visit(Print{}, args.back());
     }   
     auto to_exec = std_func_getter_.GetStdFunc(expr->function, out_, std::move(args));
     return std::visit(Executor{}, *to_exec);
@@ -118,7 +112,6 @@ Object Evaluator::operator()(ptr<StdFuncCallExpression>& expr) {
 Object Evaluator::operator()(ptr<FunctionCallExpression>& expr) {
     logger_->log("Executing function call: ", expr);
     if (std::holds_alternative<ptr<FunctionCallExpression>>(expr->function->value)) {
-        std::cout << std::get<ptr<FunctionCallExpression>>(expr->function->value);
         throw std::runtime_error("Function call is smae");
     }
     auto function = this->operator()(expr->function);
@@ -290,7 +283,6 @@ Stopping Evaluator::operator()(ptr<ArrayAssignStatement>& expr) {
         if (idx >= array.arr.size()) {
             array.arr.resize(idx + 1);
         }
-        std::cout << "idx: " << idx << "\n";
         array.arr[idx] = ExecFunnyAssign(expr->funny_assign, array.arr[idx], value);
         return Stopping::none;
     }
@@ -313,11 +305,40 @@ Stopping Evaluator::operator()(ptr<ArrayAssignStatement>& expr) {
     if (final_idx >= current_array->arr.size()) {
         current_array->arr.resize(final_idx + 1);
     }
-    std::cout << "final_idx: " << final_idx << "\n";
     current_array->arr[final_idx] = ExecFunnyAssign(expr->funny_assign, current_array->arr[final_idx], value);
     return Stopping::none;
 }
 
+Stopping Evaluator::operator()(ptr<ForInStatement>& expr) {
+    logger_->log("Evaluating for in statement");
+    auto range = std::visit(*this, expr->range);
+    if (!std::holds_alternative<CArray>(range)) {
+        throw std::runtime_error("Range is not an array");
+    }
+    CArray& array = std::get<CArray>(range);
+    for (auto& element : array.arr) {
+        // std::visit(Print{}, element);
+        env_.Enclose();
+        env_.current->SetHere(expr->ident, element);
+        for (decltype(auto) st : expr->body) {
+            // std::visit(Print{}, st);
+            Stopping stop_res = std::visit(*this, st);
+            if (stop_res == Stopping::break_s) {
+                env_.OutClose();
+                return Stopping::none;
+            }
+            if (stop_res == Stopping::return_s) {
+                env_.OutClose();
+                return Stopping::return_s;
+            }
+            if (stop_res == Stopping::continue_s) {
+                break;
+            }
+        }
+        env_.OutClose();
+    }
+    return Stopping::none;
+}
 
 Object Evaluator::ExecFunnyAssign(std::optional<TokenType> funny_assign, Object& lhs, Object& rhs) {
     if (funny_assign.has_value()) {

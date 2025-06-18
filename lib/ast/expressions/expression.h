@@ -29,7 +29,6 @@ struct FunctionCallExpression;
 
 struct StdFuncCallExpression;
 
-struct PrefixExpression;
 
 struct ScopedExpression;
 

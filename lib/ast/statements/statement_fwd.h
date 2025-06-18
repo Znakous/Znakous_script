@@ -10,13 +10,14 @@ struct IfStatement;
 struct ElseIfStatement;
 struct ElseStatement;
 struct AssignStatement;
-struct WhileStatement; // todo
-struct ExprStatement; // todo
+struct WhileStatement;
+struct ExprStatement;
 struct ArrayAssignStatement;
 
 struct ReturnStatement;
 struct BreakStatement;
 struct ContinueStatement;
+struct ForInStatement;
 
 using Statement = std::variant<ptr<WhileStatement>, ptr<ExprStatement>, ptr<IfStatement>, ptr<AssignStatement>, ptr<ReturnStatement>, ptr<ArrayAssignStatement>,
-                             ptr<BreakStatement>, ptr<ContinueStatement>>;
+                             ptr<BreakStatement>, ptr<ContinueStatement>, ptr<ForInStatement>>;

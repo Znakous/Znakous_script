@@ -1,3 +1,4 @@
+// add: Sqrt
 #pragma once
 
 #include "std_func_include.h"
@@ -16,7 +17,7 @@ struct Sqrt : BaseStd {
     Object operator()(T& a) {
         throw std::runtime_error("Sqrt does not support this type");
     }
-
+    static constexpr std::string_view name = "sqrt";
     Object operator()(double& arg);
 };
 

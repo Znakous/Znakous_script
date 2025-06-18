@@ -20,9 +20,9 @@ file(GLOB_RECURSE TEST_SOURCES
 add_executable(
   itmoscript_tests
   # loop_and_branch_test.cpp
-  files_tests.cpp
+  # files_tests.cpp
   # inerpreter_tests/interpreter_tests.cpp
-  # ${TEST_SOURCES}
+  ${TEST_SOURCES}
   # inerpreter_tests/non_wild_tests.cpp
   # inerpreter_tests/strings_tests.cpp
   # illegal_ops_test.cpp
