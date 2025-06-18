@@ -6,12 +6,9 @@
 StdFuncGetter::StdFuncGetter(){
     auto dummy = StdFuncVar{};
     auto names = GetNames<StdFuncVar, StdFuncVar>().names;
-    std::cout << "names.size(): " << names.size() << std::endl;
     for (auto& func : names) {
-        std::cout << "for item: " << func.name << std::endl;
         StdFunc var = func.value;
         functions_.insert(func.name, var);
-        std::cout << func.name << std::endl;
     }
 }
 
