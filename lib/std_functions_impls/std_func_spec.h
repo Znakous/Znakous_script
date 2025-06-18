@@ -14,9 +14,6 @@ struct StdFunc : StdFuncVar {
 };
 
 
-
-
-StdFuncPtr GetStdFunc(std::string_view s, std::ostream& out, std::vector<Object>&& args);
     
 struct Executor {
     template<typename T>

@@ -104,7 +104,6 @@ Object Evaluator::operator()(ptr<StdFuncCallExpression>& expr) {
     std::vector<Object> args;
     for (auto& arg : expr->arguments) {
         args.push_back(std::visit(*this, arg));
-        std::visit(Print{}, args.back());
     }   
     auto to_exec = std_func_getter_.GetStdFunc(expr->function, out_, std::move(args));
     return std::visit(Executor{}, *to_exec);
