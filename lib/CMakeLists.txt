@@ -5,7 +5,7 @@ file(GLOB_RECURSE SOURCES
 add_library(itmoscript
     ${SOURCES}
 )
-add_subdirectory(std_functions_impls)
+add_subdirectory(std_functions)
 add_dependencies(itmoscript std_func_all)
 
 target_include_directories(itmoscript PUBLIC 

@@ -3,8 +3,8 @@
 #include <bitset>
 #include <cctype>
 #include <string_view>
-#include "std_functions_impls/get_name.h"
-#include "std_functions_impls/std_func_spec.h"
+#include <std_functions/get_name.h>
+#include <std_functions/std_func_spec.h>
 
 const std::vector<std::string_view> std_funcs = []() {
     auto names = GetNames<StdFuncVar, StdFuncVar>().names;

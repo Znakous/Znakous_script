@@ -1,5 +1,5 @@
 #include "evaluator.h"
-#include "std_functions_impls/std_func_spec.h"
+#include <std_functions/std_func_spec.h>
 #include "logger.h"
 
 double stoi_view(std::string_view s) {

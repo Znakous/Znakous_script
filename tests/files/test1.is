@@ -1,0 +1,2 @@
+aboba = [1, function(n) return n+1 endfunction, [1, 2, 3]]
+print(aboba[0], aboba[1](17), aboba[2])
