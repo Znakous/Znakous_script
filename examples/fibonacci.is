@@ -1,7 +1,7 @@
 fib = function(n)
     if n == 0 then
         return 0
-    end if
+    endif
 
     a = 0
     b = 1
@@ -10,10 +10,10 @@ fib = function(n)
         c = a + b
         a = b
         b = c
-    end for
+    endfor
 
     return b
-end function
+endfunction
 
 
 print(fib(10))
