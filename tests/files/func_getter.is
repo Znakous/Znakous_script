@@ -1,0 +1,16 @@
+getter = function(n) {
+    if n == 1 
+        return function(m)  { return m+1 }
+    elif n == 0
+        return function(m)  { return m }
+    else 
+        return 1
+    endif
+}
+
+ans = 0
+for i in range(100){
+    ans += getter(i % 2)(i) - i
+}
+println(ans)
+print(getter(23))

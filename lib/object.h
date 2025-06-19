@@ -25,21 +25,16 @@ struct CArray {
     std::vector<Object> arr;
 };
 
-struct Object : std::variant<
+using ObjVar = std::variant<
     double,
     std::string,
     CNull,
     BuiltinFuncPtr,
     CArray,
     StdFuncPtr
-> {
-    using std::variant<
-        double,
-        std::string,
-        CNull,
-        BuiltinFuncPtr,
-        CArray,
-        StdFuncPtr
-    >::variant;
+>;
+
+struct Object : ObjVar {
+    using ObjVar::variant;
 };
 

@@ -4,7 +4,7 @@
 
 
 StdFuncGetter::StdFuncGetter(){
-    auto names = GetNames<StdFuncVar, StdFuncVar>().names;
+    auto names = GetNames<std::string_view, StdFuncVar, NameTag>().names;
     for (auto& func : names) {
         StdFunc var = func.value;
         functions_.insert(func.name, var);

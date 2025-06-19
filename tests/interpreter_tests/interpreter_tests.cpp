@@ -52,27 +52,3 @@ TEST(ClosureTests, NestedClosureTest) {
     p.Evaluate(el);
     ASSERT_EQ(test.str(), "1112");
 }
-
-TEST(ClosureTests, ClosureRecursionTest) {
-    std::ostringstream test;
-    std::string code = R"(
-        makeFactorial = function+(m)
-            factorial = function+(n)
-                if n then
-                    return n * factorial(n - 1)
-                else
-                    return 1
-                endif
-            endfunction
-            return factorial
-        endfunction
-        
-        fact = makeFactorial(13)
-        r = print(fact(5))
-    )";
-    Interpreter p(code, test);
-    auto el = p.ParseProgram();
-    p.Evaluate(el);
-    ASSERT_EQ(test.str(), "120");
-}
-

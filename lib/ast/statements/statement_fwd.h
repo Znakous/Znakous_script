@@ -19,5 +19,13 @@ struct BreakStatement;
 struct ContinueStatement;
 struct ForInStatement;
 
-using Statement = std::variant<ptr<WhileStatement>, ptr<ExprStatement>, ptr<IfStatement>, ptr<AssignStatement>, ptr<ReturnStatement>, ptr<ArrayAssignStatement>,
-                             ptr<BreakStatement>, ptr<ContinueStatement>, ptr<ForInStatement>>;
+using Statement = std::variant<ptr<WhileStatement>, 
+                                ptr<ExprStatement>, 
+                                ptr<IfStatement>, 
+                                ptr<AssignStatement>, 
+                                ptr<ReturnStatement>, 
+                                ptr<ArrayAssignStatement>,
+                                ptr<BreakStatement>, 
+                                ptr<ContinueStatement>, 
+                                ptr<ForInStatement>
+>;

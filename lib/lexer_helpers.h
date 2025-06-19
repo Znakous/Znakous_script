@@ -3,11 +3,11 @@
 #include <bitset>
 #include <cctype>
 #include <string_view>
-#include <std_functions/get_name.h>
+#include <get_name.h>
 #include <std_functions/std_func_spec.h>
 
 const std::vector<std::string_view> std_funcs = []() {
-    auto names = GetNames<StdFuncVar, StdFuncVar>().names;
+    auto names = GetNames<std::string_view, StdFuncVar, NameTag>().names;
     std::vector<std::string_view> names_view;
     for (auto& name : names) {
         names_view.push_back(name.name);

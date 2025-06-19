@@ -24,7 +24,7 @@ struct LowerUpper : BaseStd {
         throw std::runtime_error("LowerUpper: argument is not a string");
     }
 
-    Object operator()(std::string& a) {
+    Object operator()(const std::string& a) {
         std::string str = a;
         if constexpr (c == StringTransform::lower) {
             std::transform(str.begin(), str.end(), str.begin(), [](unsigned char ch) { return std::tolower(ch); });

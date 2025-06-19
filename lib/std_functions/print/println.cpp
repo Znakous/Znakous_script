@@ -1,7 +1,7 @@
 #include "println.h"
 
 
-void PrintLn::operator()(CArray& a) {
+void PrintLn::operator()(const CArray& a) {
     out->get() << "[";
     for (size_t i = 0; i < a.arr.size(); ++i) {
         std::visit(*this, a.arr[i]);
@@ -11,7 +11,7 @@ void PrintLn::operator()(CArray& a) {
     }
     out->get() << "]";
 }
-void PrintLn::operator()(StdFuncPtr& a) {
+void PrintLn::operator()(const StdFuncPtr&) {
     out->get() << "<std_function>";
 }
 Object PrintLn::Execute() { 

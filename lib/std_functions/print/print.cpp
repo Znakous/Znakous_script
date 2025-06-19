@@ -1,6 +1,6 @@
 #include "print.h"
 
-void Print::operator()(CArray& a) {
+void Print::operator()(const CArray& a) {
     out->get() << "[";
     for (size_t i = 0; i < a.arr.size(); ++i) {
         std::visit(*this, a.arr[i]);
@@ -10,7 +10,7 @@ void Print::operator()(CArray& a) {
     }
     out->get() << "]";
 }
-void Print::operator()(StdFuncPtr& a) {
+void Print::operator()(const StdFuncPtr&) {
     out->get() << "<std_function> ";
 }
 Object Print::Execute() { 

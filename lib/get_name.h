@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <typeinfo>
+#include <type_traits>
 #include <variant>
 #include <vector>
 
@@ -11,27 +11,41 @@ struct NameAndType {
     VarType value;
 };
 
-template<typename NameType, typename VarType, typename T>
+
+// for dispatch
+struct NameTag{};
+struct TokenTag{};
+
+template<typename NameType, typename VarType, typename T, typename Tag>
 constexpr NameAndType<NameType, VarType> get_name() {
-    return {T::name, T()};
+    if constexpr(std::same_as<Tag, NameTag>) {
+        return {T::name, T()};
+    } else {
+        return {T::token, T()};
+    }
 }
 
-template<typename NameType, typename VarType, typename T>
-struct GetNames {};
 
-template<typename NameType, typename VarType, typename T, typename... Types>
-struct GetNames<NameType, VarType, std::variant<T, Types...>> {
+
+template<typename Tag, typename NameType, typename VarType, typename T>
+struct GetNamesImpl {};
+
+template<typename Tag, typename NameType, typename VarType, typename T, typename... Types>
+struct GetNamesImpl<Tag, NameType, VarType, std::variant<T, Types...>> {
     std::vector<NameAndType<NameType, VarType>> names;
-    GetNames() {
-        names = GetNames<NameType, VarType, std::variant<Types...>>().names;
-        names.push_back(get_name<VarType, T>());
+    GetNamesImpl() {
+        names = GetNamesImpl<Tag, NameType, VarType, std::variant<Types...>>().names;
+        names.push_back(get_name<NameType, VarType, T, Tag>());
     }
 };
 
-template<typename NameType, typename VarType, typename T>
-struct GetNames<NameType, VarType, std::variant<T>> {
+template<typename Tag, typename NameType, typename VarType, typename T>
+struct GetNamesImpl<Tag, NameType, VarType, std::variant<T>> {
     std::vector<NameAndType<NameType, VarType>> names;
-    GetNames() {
-        names.push_back(get_name<VarType, T>());
+    GetNamesImpl() {
+        names.push_back(get_name<NameType, VarType, T, Tag>());
     }
 };
+
+template<typename NameType, typename VarType, typename Tag>
+using GetNames = GetNamesImpl<Tag, NameType, VarType, VarType>;

@@ -175,10 +175,12 @@ Expression Parser::ParseExpression() {
         if (cur_token_.type == TokenType::rparen) {
             AdvanceTokens(); // skip )
         }
-
+        if (cur_token_.type == TokenType::lbrace) {
+            AdvanceTokens(); // skip {
+        }
         logger_->log("Parsing function body");
 
-        while (cur_token_.type != TokenType::endfunc) {
+        while (cur_token_.type != TokenType::end_token) {
             ans->body.push_back(ParseStatement());
         }
 
@@ -208,7 +210,7 @@ ptr<WhileStatement> Parser::ParseWhileStatement() {
     ans->condition = ParseExpression();
     
     logger_->log("Parsing while body");
-    while (cur_token_.type != TokenType::endwhile) {
+    while (cur_token_.type != TokenType::end_token) {
         ans->body.push_back(ParseStatement());
     }
     
@@ -237,7 +239,11 @@ ptr<ForInStatement> Parser::ParseForInStatement() {
 
     ans->range = ParseExpression();
 
-    while (cur_token_.type != TokenType::endfor) {
+    if (cur_token_.type == TokenType::lbrace) {
+        AdvanceTokens(); // skip {
+    }
+
+    while (cur_token_.type != TokenType::end_token) {
         ans->body.push_back(ParseStatement());
     }
 
@@ -261,8 +267,8 @@ ptr<IfStatement> Parser::ParseIfStatement() {
     logger_->log("Parsing if condition");
     if_statement->condition = ParseExpression();
     
-    if (cur_token_.type != TokenType::then) {
-        logger_->log("Error: missing 'then' keyword");
+    if (cur_token_.type != TokenType::then && cur_token_.type != TokenType::lbrace) {
+        logger_->log("Error: missing 'then' keyword or '{'");
     } else {
         AdvanceTokens();
     }
@@ -335,23 +341,19 @@ ptr<ExpressionImpl<0>> Parser::ParseArrayAccess(ptr<ExpressionImpl<0>> array) {
     AdvanceTokens(); // skip [
 
     if (cur_token_.type == TokenType::colon) {
-        // Handle [:end] case
         return ParseArraySlice(array, std::nullopt);
     }
 
     if (peek_token_.type == TokenType::colon) {
-        // Handle [start:...] case
         Expression start = ParseExpression();
         return ParseArraySlice(array, start);
     }
 
-    // Regular array access
     ptr<ArrayAccessExpression> array_access = make_ptr<ArrayAccessExpression>();
     array_access->array = array;
     array_access->indices.push_back(ParseExpression());
     AdvanceTokens(); // skip ]
 
-    // Create level 0 expression
     ptr<ExpressionImpl<0>> expr = make_ptr<ExpressionImpl<0>>();
     expr->value = array_access;
     return expr;
@@ -367,12 +369,10 @@ ptr<ExpressionImpl<0>> Parser::ParseArraySlice(ptr<ExpressionImpl<0>> array, std
         AdvanceTokens(); // skip first :
     }
 
-    // Parse end if present
     if (cur_token_.type != TokenType::colon && cur_token_.type != TokenType::rsquare) {
         slice->end = ParseExpression();
     }
 
-    // Parse step if present
     if (cur_token_.type == TokenType::colon) {
         AdvanceTokens(); // skip second :
         if (cur_token_.type != TokenType::rsquare) {
@@ -384,7 +384,6 @@ ptr<ExpressionImpl<0>> Parser::ParseArraySlice(ptr<ExpressionImpl<0>> array, std
         AdvanceTokens(); // skip ]
     }
 
-    // Create level 0 expression
     ptr<ExpressionImpl<0>> expr = make_ptr<ExpressionImpl<0>>();
     expr->value = slice;
     return expr;

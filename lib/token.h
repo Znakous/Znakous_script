@@ -21,9 +21,9 @@ enum class TokenType {
     invalid,
     then,
     ident,
-    for_s, endfor, while_s, in_s,
-    assign, endif, comma, endfunc,
-    stdfunc, endwhile,
+    for_s, while_s, in_s,
+    assign, comma,
+    stdfunc,
     lsquare, rsquare,
     break_s,
     continue_s,
@@ -31,7 +31,8 @@ enum class TokenType {
     slice_access,
     power,
     funny_assign, null,
-    bit_and, bit_or, bit_xor, and_, or_, xor_
+    bit_and, bit_or, bit_xor, and_, or_, xor_,
+    end_token
 };
 
 
@@ -50,24 +51,24 @@ struct Token {
 
 constexpr std::pair<std::string_view, Token> keywords[] = {
     {"function", {TokenType::func, std::nullopt}},
-    {"endfunction", {TokenType::endfunc, std::nullopt}},
+    {"endfunction", {TokenType::end_token, std::nullopt}},
     {"return", {TokenType::ret, std::nullopt}},
     {"if", {TokenType::if_s, std::nullopt}},
     {"elif", {TokenType::elif_s, std::nullopt}},
     {"else", {TokenType::else_s, std::nullopt}},
-    {"endif", {TokenType::endif, std::nullopt}},
+    {"endif", {TokenType::end_token, std::nullopt}},
     {"then", {TokenType::then, std::nullopt}},
     {"for", {TokenType::for_s, std::nullopt}},
-    {"endfor", {TokenType::endfor, std::nullopt}},
+    {"endfor", {TokenType::end_token, std::nullopt}},
     {"while", {TokenType::while_s, std::nullopt}},
-    {"endwhile", {TokenType::endwhile, std::nullopt}},
+    {"endwhile", {TokenType::end_token, std::nullopt}},
     {"in", {TokenType::in_s, std::nullopt}},
     {"break", {TokenType::break_s, std::nullopt}},
     {"continue", {TokenType::continue_s, std::nullopt}},
     {"(", {TokenType::lparen, std::nullopt}},
     {")", {TokenType::rparen, std::nullopt}},
     {"{", {TokenType::lbrace, std::nullopt}},
-    {"}", {TokenType::rbrace, std::nullopt}},
+    {"}", {TokenType::end_token, std::nullopt}},
     {"=", {TokenType::assign, std::nullopt}},
     {"+=", {TokenType::funny_assign, "+"}},
     {"-=", {TokenType::funny_assign, "-"}},
@@ -88,8 +89,8 @@ constexpr std::pair<std::string_view, Token> keywords[] = {
     {"&&", {TokenType::and_, std::nullopt}},
     {"|", {TokenType::bit_or, std::nullopt}},
     {"||", {TokenType::or_, std::nullopt}},
-    {"`", {TokenType::xor_, std::nullopt}},
-    {"``", {TokenType::bit_xor, std::nullopt}},
+    {"`", {TokenType::bit_xor, std::nullopt}},
+    {"``", {TokenType::xor_, std::nullopt}},
     {"==", {TokenType::eq, std::nullopt}},
     {"<", {TokenType::less, std::nullopt}},
     {">", {TokenType::greater, std::nullopt}},
@@ -103,6 +104,7 @@ constexpr std::pair<std::string_view, Token> keywords[] = {
     {"false", {TokenType::intliteral, "0"}},
     {"null", {TokenType::null, std::nullopt}},
     {"nil", {TokenType::null, std::nullopt}},
+    {"end", {TokenType::end_token, std::nullopt}},
 };
 
 
@@ -129,4 +131,5 @@ bool IsLevelOperator<5>(Token token);
 template<>
 bool IsLevelOperator<6>(Token token);
 
-// TokenType GetFunnyAssign(std::string_view op);
+template<>
+bool IsLevelOperator<7>(Token token);

@@ -13,8 +13,8 @@ struct Len : BaseStd {
         return CNull{};
     }
 
-    Object operator()(std::string& a);
-    Object operator()(CArray& a);   
+    Object operator()(const std::string& a);
+    Object operator()(const CArray& a);   
     Object Execute();
     static constexpr std::string_view name = "len";
 };

@@ -7,7 +7,6 @@ project(
 
 set(CMAKE_CXX_STANDARD 23)
 
-# Set default build type if not specified
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
@@ -27,7 +26,6 @@ else()
     endif()
 endif()
 
-# Output the build type
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 include_directories(lib)

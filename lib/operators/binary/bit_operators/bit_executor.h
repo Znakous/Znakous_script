@@ -2,6 +2,7 @@
 
 #include <operators\base_operator.h>
 #include <token.h>
+#include <iostream>
 
 // add: BitOperVisitor<BitOper::and_>
 // add: BitOperVisitor<BitOper::or_>
@@ -13,7 +14,6 @@ template<BitOper oper>
 struct BitOperVisitor : BinaryOperVisitor {
     using BinaryOperVisitor::BinaryOperVisitor;
     virtual Object operator()(Object& a, Object& b) override {
-        logger_->log("Computing bit operation between types: ", typeid(a).name(), " and ", typeid(b).name());
         return std::visit(*this, a, b);
     }
     Object operator()(const double& a_double, const double& b_double) {
@@ -32,14 +32,14 @@ struct BitOperVisitor : BinaryOperVisitor {
     Object operator()(const T&, const U&) {
         throw std::runtime_error("Invalid operation bit");
     }
-    static constexpr TokenType token;
+    static constexpr TokenType token = TokenType::invalid;
 };
 
 template<>
-constexpr Token BitOperVisitor<BitOper::and_>::token = TokenType::and_;
+constexpr TokenType BitOperVisitor<BitOper::and_>::token = TokenType::bit_and;
 
 template<>
-constexpr Token BitOperVisitor<BitOper::or_>::token = TokenType::or_;
+constexpr TokenType BitOperVisitor<BitOper::or_>::token = TokenType::bit_or;
 
 template<>
-constexpr Token BitOperVisitor<BitOper::xor_>::token = TokenType::xor_;
+constexpr TokenType BitOperVisitor<BitOper::xor_>::token = TokenType::bit_xor;

@@ -49,10 +49,6 @@ struct Environment {
             logger_->log("Object not found");
             return std::nullopt;
         } 
-        // if (resp.value().size != ident.size()) {
-        //     logger_->log("Object size mismatch");
-        //     return std::nullopt;
-        // }
         logger_->log("Object found");
         return resp->param;
     }

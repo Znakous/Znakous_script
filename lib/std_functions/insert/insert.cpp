@@ -5,6 +5,6 @@ Object Insert::Execute() {
 }
 
 Object Insert::operator()(CArray& a, double& b, double& c) {
-    a.arr.insert(a.arr.begin() + b, c); // прикастует
+    a.arr.insert(a.arr.begin() + b, c);
     return CNull{};
 }

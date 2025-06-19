@@ -110,15 +110,12 @@ Object Evaluator::operator()(ptr<StdFuncCallExpression>& expr) {
 }
 Object Evaluator::operator()(ptr<FunctionCallExpression>& expr) {
     logger_->log("Executing function call: ", expr);
-    if (std::holds_alternative<ptr<FunctionCallExpression>>(expr->function->value)) {
-        throw std::runtime_error("Function call is smae");
-    }
     auto function = this->operator()(expr->function);
     ptr<FunctionalExpression> to_invoke = std::get<ptr<FunctionalExpression>>(function);
     logger_->log("Function resolved, preparing to invoke");
     
     std::vector<Object> args;
-    for (auto& arg : expr->arguments) {  // Process all provided arguments
+    for (auto& arg : expr->arguments) {  
         args.push_back(std::visit(*this, arg));
     }
 
@@ -162,12 +159,6 @@ Object Evaluator::operator()(ptr<ScopedExpression>& expr) {
     logger_->log("Evaluating scoped expression");
     return std::visit(*this, expr->underlying);
 }
-// Object visit(PrefixExpression& expr) {
-//     if (expr.prefix_oper == TokenType::minus) {
-//         return 
-//     }
-// }
-
 Object Evaluator::operator()(ptr<ArrayExpression>& expr) {
     logger_->log("Creating array");
     CArray array;
@@ -316,11 +307,9 @@ Stopping Evaluator::operator()(ptr<ForInStatement>& expr) {
     }
     CArray& array = std::get<CArray>(range);
     for (auto& element : array.arr) {
-        // std::visit(Print{}, element);
         env_.Enclose();
         env_.current->SetHere(expr->ident, element);
         for (decltype(auto) st : expr->body) {
-            // std::visit(Print{}, st);
             Stopping stop_res = std::visit(*this, st);
             if (stop_res == Stopping::break_s) {
                 env_.OutClose();

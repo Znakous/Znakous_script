@@ -14,8 +14,8 @@ struct Print : BaseStd {
     void operator()(const T& a) {
         out->get() << a;
     };
-    void operator()(CArray& a);
-    void operator()(StdFuncPtr& a);
+    void operator()(const CArray& a);
+    void operator()(const StdFuncPtr& a);
     Object Execute();
     
     static constexpr std::string_view name = "print";

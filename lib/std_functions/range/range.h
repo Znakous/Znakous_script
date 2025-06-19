@@ -10,7 +10,7 @@ struct Range : BaseStd {
     Object operator()(const T&, const U&, const V&) {
         throw std::runtime_error("Range: argument is not a number");
     }
-    Object operator()(double a, double b, double c);
+    Object operator()(const double& a, const double& b, const double& c);
     Object Execute();
     static constexpr std::string_view name = "range";
 };

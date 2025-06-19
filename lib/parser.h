@@ -95,28 +95,24 @@ struct Parser {
             std::string_view name = cur_token_.value.value();
             AdvanceTokens();
             
-            // Create initial identifier expression
             ptr<ExpressionImpl<0>> expr = make_ptr<ExpressionImpl<0>>();
             auto ident = make_ptr<IdentifierExpression>();
             ident->name = name;
             expr->value = ident;
             
             
-            // Handle function calls and array access/slice
             while (cur_token_.type == TokenType::lparen || cur_token_.type == TokenType::lsquare) {
                 if (cur_token_.type == TokenType::lparen) {
                     logger_->log("Parsing function call");
                     auto call = make_ptr<FunctionCallExpression>();
                     call->token = cur_token_;
                     
-                    // Create a new expression to hold the previous value
                     ptr<ExpressionImpl<0>> func_expr = make_ptr<ExpressionImpl<0>>();
-                    func_expr->value = expr->value;  // Copy the previous value
-                    call->function = func_expr;      // Use the new expression
+                    func_expr->value = expr->value; 
+                    call->function = func_expr;
                     
                     call->arguments = ParseArguments();
                     
-                    // Update expr with the new function call
                     expr = make_ptr<ExpressionImpl<0>>();
                     expr->value = call;
                 } else if (cur_token_.type == TokenType::lsquare) {
@@ -124,7 +120,6 @@ struct Parser {
                     AdvanceTokens(); // skip [
                     
                     if (cur_token_.type == TokenType::colon) {
-                        // Handle [:end] case
                         auto slice = make_ptr<ArraySliceExpression>();
                         slice->array = expr;
                         AdvanceTokens(); // skip :
@@ -144,10 +139,8 @@ struct Parser {
                         expr = make_ptr<ExpressionImpl<0>>();
                         expr->value = slice;
                     } else {
-                        // Check for slice with start value
                         Expression index = ParseExpression();
                         if (cur_token_.type == TokenType::colon) {
-                            // Handle [start:...] case
                             auto slice = make_ptr<ArraySliceExpression>();
                             slice->array = expr;
                             slice->start = index;
@@ -168,7 +161,6 @@ struct Parser {
                             expr = make_ptr<ExpressionImpl<0>>();
                             expr->value = slice;
                         } else {
-                            // Regular array access
                             auto access = make_ptr<ArrayAccessExpression>();
                             access->array = expr;
                             access->indices.push_back(index);

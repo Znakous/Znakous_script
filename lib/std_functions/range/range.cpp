@@ -11,7 +11,7 @@ Object Range::Execute() {
     throw std::runtime_error("Range: wrong number of arguments");
 }
 
-Object Range::operator()(double a, double b, double c) {
+Object Range::operator()(const double& a, const double& b, const double& c) {
     CArray ans;
     for (double i = a; i < b; i += c) {
         ans.arr.push_back(i);

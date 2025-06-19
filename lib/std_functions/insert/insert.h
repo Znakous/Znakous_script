@@ -2,7 +2,7 @@
 
 #pragma once
 #include <std_functions/base_std.h>
-#include "object.h"
+#include <object.h>
 
 struct Insert : BaseStd {
     ~Insert() = default;

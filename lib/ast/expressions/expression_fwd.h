@@ -1,7 +1,7 @@
 #pragma once
 
 #include <variant>
-#include "../../../lib/usings.h"
+#include <usings.h>
 
 template<size_t Level>
 struct Operator;

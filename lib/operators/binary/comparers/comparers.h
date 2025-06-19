@@ -30,7 +30,7 @@ struct EqVisitor : BinaryOperVisitor {
         logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation eq");
     }
-    static constexpr TokenType token = TokenType::eq
+    static constexpr TokenType token = TokenType::eq;
 };
 
 struct NeqVisitor : BinaryOperVisitor {
@@ -77,7 +77,7 @@ struct LessVisitor : BinaryOperVisitor {
         logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation less");
     }
-    static constexpr TokenType token = TokenType::less
+    static constexpr TokenType token = TokenType::less;
 };
 
 struct GreaterVisitor : BinaryOperVisitor {
@@ -99,7 +99,7 @@ struct GreaterVisitor : BinaryOperVisitor {
         logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation greater");
     }
-    static constexpr TokenType token = TokenType::greater
+    static constexpr TokenType token = TokenType::greater;
 };
 
 struct LeqVisitor : BinaryOperVisitor {

@@ -1,0 +1,18 @@
+f = [function(n) return 34 endfunction, 
+    function(n) return n * 2 endfunction, 
+    function() return [
+        function(n) return n + 1 endfunction,
+        function(n) return n + 2 endfunction,
+        function(n) return [n, n * 10] endfunction
+    ] endfunction, 
+    function(u) {
+        if u % 2 == 0 
+            return "even"
+        else
+            return "odd"
+        endif
+    }
+]
+
+println(f[0](17), " ", f[2]()[1](10), " ", f[2]()[2](15)[1])
+println((f[3](68) + " aboba ") * 2);

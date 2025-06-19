@@ -7,7 +7,7 @@ bool interpret(std::istream& input, std::ostream& output) {
         inter.Evaluate(prog);   
         return true;
     } catch (const std::exception& e) {
-        output << e.what() << "<--------" << std::endl;
+        std::cerr << e.what() << " <--------" << std::endl;
         return false;
     }
 }

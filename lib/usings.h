@@ -5,7 +5,7 @@
 #include <functional>
 
 
-constexpr size_t operators_levels = 6;
+constexpr size_t operators_levels = 7;
 
 
 enum class BitOper {

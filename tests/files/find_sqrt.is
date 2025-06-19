@@ -1,0 +1,16 @@
+is_sqrt = function(n, s)
+    return s * s == n
+endfunction
+
+find_sqrt = function(n) {
+    for i in range(n+1)
+        if is_sqrt(n, i) {
+            return i
+        }
+    endfor
+    return-1
+}
+
+println(find_sqrt(4))
+println(find_sqrt(50))
+println(find_sqrt(144))

@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "object.h"
+#include <object.h>
 #include <std_functions/base_std.h>
 
 struct Read : BaseStd {

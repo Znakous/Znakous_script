@@ -17,12 +17,45 @@ struct TrieNode{
             l = nullptr;
         }
     }
+
+    TrieNode(const TrieNode& other) : cbe(other.cbe), count_in_subtree(other.count_in_subtree) {
+        for(int i = 0; i < 256; ++i) {
+            to[i] = other.to[i] ? new TrieNode(*other.to[i]) : nullptr;
+        }
+    }
+
+    TrieNode& operator=(const TrieNode& other) {
+        if (this != &other) {
+            DestroySubtree();
+            cbe = other.cbe;
+            count_in_subtree = other.count_in_subtree;
+            for(int i = 0; i < 256; ++i) {
+                to[i] = other.to[i] ? new TrieNode(*other.to[i]) : nullptr;
+            }
+        }
+        return *this;
+    }
+
+    void DestroySubtree() {
+        for (auto& l : to) {
+            if (l) {
+                l->DestroySubtree();
+                delete l;
+                l = nullptr;
+            }
+        }
+    }
+
+    ~TrieNode() {
+        DestroySubtree();
+    }
 };
 
 template<typename T>
 struct TrieResponse {
     T param;
     uint32_t size;
+    TrieResponse(const T& p, uint32_t s) : param(p), size(s) {}
 };
 
 
@@ -34,7 +67,20 @@ public:
     Trie(){
         root = new Node();
     }
-    void destroy() {}
+
+    Trie(const Trie& other) : root(new Node(*other.root)) {}
+
+    Trie& operator=(const Trie& other) {
+        if (this != &other) {
+            delete root;
+            root = new Node(*other.root);
+        }
+        return *this;
+    }
+
+    ~Trie() {
+        delete root;
+    }
     void insert(std::string_view word, const T& ending) {
         Node *r = root;
         for(const auto& c : word){

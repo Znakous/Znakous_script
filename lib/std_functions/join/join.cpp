@@ -5,7 +5,7 @@ Object Join::Execute() {
     return std::visit(*this, args[0], args[1]);
 }
 
-Object Join::operator()(CArray& a, std::string& b_str) {
+Object Join::operator()(const CArray& a, const std::string& b_str) {
     if (a.arr.empty()) {
         return "";
     }

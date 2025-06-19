@@ -5,11 +5,11 @@
 #include <algorithm>
 #include <optional>
 
-#include "../../../lib/token.h"
-#include "../../../lib/usings.h"
-#include "../../../lib/environment_fwd.h"
+#include <token.h>
+#include <usings.h>
+#include <environment_fwd.h>
 #include "expression_fwd.h"
-#include "../statements/statement_fwd.h"
+#include <ast/statements/statement_fwd.h>
 
 
 template<size_t Level>
@@ -17,22 +17,6 @@ struct Operator {
     Token token;
 };
 
-// level 0 Expressions
-
-struct IntLiteralExpression;
-
-struct StringLiteralExpression;
-
-struct IdentifierExpression;
-
-struct FunctionCallExpression;
-
-struct StdFuncCallExpression;
-
-
-struct ScopedExpression;
-
-// level-building
 
 template<size_t Level>
 struct ExpressionImpl;
@@ -81,6 +65,8 @@ struct ExpressionImpl<1> { // for prefix operations only
     std::optional<Token> prefix_oper;
     ptr<ExpressionImpl<0>> underlying;
 };
+
+
 template<>
 struct ExpressionImpl<0> {
     std::variant<ptr<FunctionCallExpression>, ptr<StringLiteralExpression>,
