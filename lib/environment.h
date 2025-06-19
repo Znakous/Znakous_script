@@ -125,8 +125,8 @@ struct Environment {
     }
 
     Trie<Object>* namespc_;
-    Environment* parent_=nullptr;
     std::shared_ptr<logging::Logger> logger_;
+    Environment* parent_=nullptr;
 };
 
 struct EnvironmentMaster {

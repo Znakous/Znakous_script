@@ -1,7 +1,5 @@
 #include "len.h"
 
-Len::Len(std::ostream& out, std::vector<Object>&& args) : BaseStd(out, std::move(args)) {}
-
 Object Len::Execute() {
     return std::visit(*this, args[0]);
 }

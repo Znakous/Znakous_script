@@ -6,7 +6,6 @@
 
 #include <iostream>
 
-// 
 
 template<typename T>
 struct TrieNode{
@@ -97,7 +96,6 @@ public:
     T& get_nocheck(const char* word) {
         Node *r = root;
         T* cur = nullptr;
-        uint32_t cur_size = 0;
         uint32_t i = 0;
         for(;; ++i){ // will eventually break
             char l = word[i];
@@ -106,7 +104,6 @@ public:
             }
             if (r->cbe) {
                 cur = &(r->cbe.value());
-                cur_size = i;
             }
             if (r->to[l]) {
                 r = r->to[l];
@@ -116,7 +113,6 @@ public:
         }
         if (r->cbe) {
             cur = &(r->cbe.value());
-            cur_size = i;
         }
         if (cur){
             return *cur;

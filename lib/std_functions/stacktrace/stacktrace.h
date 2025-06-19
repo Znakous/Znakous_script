@@ -4,7 +4,6 @@
 #include "object.h"
 
 struct Stacktrace : BaseStd {
-    Stacktrace() = default;
     ~Stacktrace() = default;
     Object Execute();
     static constexpr std::string_view name = "stacktrace";

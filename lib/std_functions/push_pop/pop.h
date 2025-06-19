@@ -5,10 +5,9 @@
 #include "object.h"
 
 struct Pop : BaseStd {
-    Pop() = default;
     ~Pop() = default;
     template<typename T>
-    Object operator()(T& a) {
+    Object operator()(const T&) {
         throw std::runtime_error("Pop: argument is not an array");
     }
     Object operator()(CArray& a);

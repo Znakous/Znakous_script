@@ -13,9 +13,6 @@
 constexpr double True_val = 1.0;
 constexpr double False_val = 0.0;
 
-// using Number = double;
-// using Value = std::variant<double, std::string, bool, std::monostate>;
-
 
 struct BinaryOperVisitor {
     BinaryOperVisitor(std::shared_ptr<logging::Logger> log)
@@ -59,7 +56,7 @@ struct UnaryMinusVisitor : UnaryOperVisitor {
         return result; 
     }
     template<typename T>
-    Object operator()(const T& t) { 
+    Object operator()(const T&) { 
         logger_->log("Invalid unary minus on type: ", typeid(T).name());
         throw std::runtime_error("Invalid operation unary minus");
     }
@@ -81,7 +78,7 @@ struct AddVisitor : BinaryOperVisitor {
         return std::string(a) + b;  
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid addition between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation add " + std::string(typeid(T).name()) + " " + std::string(typeid(U).name()));
     }
@@ -104,7 +101,7 @@ struct SubVisitor : BinaryOperVisitor {
     }
     
     template<typename T, typename U>
-    Object operator()(T&&, U&&) { 
+    Object operator()(const T&, const U&) { 
         throw std::runtime_error("Invalid operation sub");
     }
 };
@@ -134,7 +131,7 @@ struct MultVisitor : BinaryOperVisitor {
         return ans;
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid multiplication between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation mult");
     }
@@ -156,7 +153,7 @@ struct DivideVisitor : BinaryOperVisitor {
         return std::string(a.substr(0, cut));
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid division between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation divide");
     }
@@ -177,7 +174,7 @@ struct EqVisitor : BinaryOperVisitor {
         return a == b ? True_val : False_val;
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation eq");
     }
@@ -198,7 +195,7 @@ struct NeqVisitor : BinaryOperVisitor {
         return a != b ? True_val : False_val;
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation neq");
     }
@@ -222,7 +219,7 @@ struct LessVisitor : BinaryOperVisitor {
         return a < b ? True_val : False_val;   
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation less");
     }
@@ -243,7 +240,7 @@ struct GreaterVisitor : BinaryOperVisitor {
         return a > b ? True_val : False_val;    
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation greater");
     }
@@ -264,7 +261,7 @@ struct LeqVisitor : BinaryOperVisitor {
         return a <= b ? True_val : False_val;   
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation leq");
     }
@@ -285,7 +282,7 @@ struct GeqVisitor : BinaryOperVisitor {
         return a >= b ? True_val : False_val;   
     }   
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation geq");
     }
@@ -306,7 +303,7 @@ struct BinaryAndVisitor : BinaryOperVisitor {
         return (!a.empty()) && (!b.empty()) ? True_val : False_val;   
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation binary and");
     }
@@ -327,7 +324,7 @@ struct BinaryOrVisitor : BinaryOperVisitor {
         return (!a.empty()) || (!b.empty()) ? True_val : False_val;   
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid comparison between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation binary or");
     }
@@ -344,7 +341,7 @@ struct PowerVisitor : BinaryOperVisitor {
         return std::pow(a, b);
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid power operation between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation power");
     }
@@ -364,7 +361,7 @@ struct ModVisitor : BinaryOperVisitor {
         return std::fmod(a, b);
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) { 
+    Object operator()(const T&, const U&) { 
         logger_->log("Invalid modulo operation between types: ", typeid(T).name(), " and ", typeid(U).name());
         throw std::runtime_error("Invalid operation modulo");
     }
@@ -393,7 +390,7 @@ struct BitOperVisitor : BinaryOperVisitor {
         throw std::runtime_error("Invalid bit operation");
     }
     template<typename T, typename U>
-    Object operator()(const T& t, const U& u) {
+    Object operator()(const T&, const U&) {
         throw std::runtime_error("Invalid operation bit");
     }
 };

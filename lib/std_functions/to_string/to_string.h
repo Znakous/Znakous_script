@@ -8,14 +8,12 @@
 #include <stdexcept>
 
 struct ToString : BaseStd {
-    ToString() : BaseStd(std::cout) {}
-    ToString(std::ostream& out, std::vector<Object>&& args);
     ~ToString() = default;
 
     Object Execute();
 
     template<typename T>
-    Object operator()(T& a) {
+    Object operator()(const T&) {
         throw std::runtime_error("Sqrt does not support this type");
     }
 

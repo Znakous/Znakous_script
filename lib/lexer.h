@@ -25,7 +25,6 @@ protected:
     virtual Token NextToken() = 0;
 
     std::string str_;
-    size_t derived_size;
     uint32_t cur_pos_;
     uint32_t read_pos_;
     char cur_char_;

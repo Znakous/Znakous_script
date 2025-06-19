@@ -11,11 +11,9 @@
 
 
 struct Abs : BaseStd {
-    Abs() : BaseStd(std::cout) {}
-    Abs(std::ostream& out, std::vector<Object>&& args);
     ~Abs() = default;
     template<typename T>
-    Object operator()(T& a) {
+    Object operator()(const T&) {
         throw std::runtime_error("Abs does not support this type");
         return CNull{};
     }

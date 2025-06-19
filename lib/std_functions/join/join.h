@@ -8,12 +8,10 @@
 
 
 struct Join : BaseStd {
-    Join() : BaseStd(std::cout) {}
-    Join(std::ostream& out, std::vector<Object>&& args) : BaseStd(out, std::move(args)) {}
     ~Join() = default;
 
     template<typename T, typename O>
-    Object operator()(T& a, O& b) {
+    Object operator()(const T&, const O&) {
         throw std::runtime_error("Join: argument is not a string");
     }
 

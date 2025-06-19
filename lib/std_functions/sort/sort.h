@@ -6,10 +6,9 @@
 #include "visitor.h"
 
 struct Sort : BaseStd {
-    Sort() = default;
     ~Sort() = default;
     template<typename T>
-    Object operator()(T& a) {
+    Object operator()(const T&) {
         throw std::runtime_error("Sort: argument is not an array");
     }
     Object operator()(CArray& a);

@@ -8,7 +8,7 @@
 #include <std_functions/base_std.h>
 
 struct Read : BaseStd {
-    Read() : BaseStd(std::cout) {}
+    ~Read() = default;
     Object Execute() {
         std::string s;
         std::cin >> s;

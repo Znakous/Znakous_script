@@ -5,11 +5,9 @@
 #include <std_functions/base_std.h>
 
 struct PrintLn : BaseStd {
-    PrintLn() : BaseStd(std::cout) {}
-    PrintLn(std::ostream& out, std::vector<Object>&& args_);
     ~PrintLn() = default;
     template<typename T>
-    void operator()(T& a) {
+    void operator()(const T& a) {
         out->get() << a;
     };
     void operator()(CArray& a);

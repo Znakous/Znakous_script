@@ -5,10 +5,9 @@
 #include "object.h"
 
 struct Insert : BaseStd {
-    Insert() = default;
     ~Insert() = default;
     template<typename T, typename U, typename V>
-    Object operator()(T& a, U& b, V& c) {
+    Object operator()(const T&, const U&, const V&) {
         throw std::runtime_error("Insert: argument is not an array");
     }
     Object operator()(CArray& a, double& b, double& c);

@@ -7,14 +7,12 @@
 #include <stdexcept>
 
 struct Sqrt : BaseStd {
-    Sqrt() : BaseStd(std::cout) {}
-    Sqrt(std::ostream& out, std::vector<Object>&& args);
     ~Sqrt() = default;
 
     Object Execute();
 
     template<typename T>
-    Object operator()(T& a) {
+    Object operator()(const T&) {
         throw std::runtime_error("Sqrt does not support this type");
     }
     static constexpr std::string_view name = "sqrt";

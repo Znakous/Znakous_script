@@ -1,0 +1,12 @@
+a = [[8, 9], [6, 7], [5, 3]]
+d = []
+for el in a
+    i = 0
+    while i < len(el)
+        d = push(d, el[i])
+        i += 1
+    endwhile
+endfor
+
+sorted = sort(d)
+print(sorted)

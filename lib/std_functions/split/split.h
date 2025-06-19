@@ -8,12 +8,10 @@
 #include "object.h"
 
 struct Split : BaseStd {
-    Split() : BaseStd(std::cout) {}
-    Split(std::ostream& out, std::vector<Object>&& args) : BaseStd(out, std::move(args)) {}
     ~Split() = default;
 
     template<typename T, typename O>
-    Object operator()(T& a, O& b) {
+    Object operator()(const T&, const O&) {
         throw std::runtime_error("Split: argument is not a string");
     }
 

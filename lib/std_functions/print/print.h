@@ -9,12 +9,9 @@
 #include <std_functions/base_std.h>
 
 struct Print : BaseStd {
-    Print() : BaseStd(std::cout) {}
-    Print(std::ostream& out, std::vector<Object>&& args);
-    
     ~Print() = default;
     template<typename T>
-    void operator()(T& a) {
+    void operator()(const T& a) {
         out->get() << a;
     };
     void operator()(CArray& a);

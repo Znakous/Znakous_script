@@ -5,7 +5,7 @@
 
 
 Lexer::Lexer(std::string&& data, std::shared_ptr<logging::Logger> logger)
- : str_(std::move(data)), cur_pos_(0), read_pos_(0), derived_size(0), logger_(logger) {
+ : str_(std::move(data)), cur_pos_(0), read_pos_(0), logger_(logger) {
     for (const auto& keyword : keywords) {
         keywords_.insert(keyword.first, keyword.second);
     }
@@ -16,7 +16,6 @@ Lexer::Lexer(std::string&& data, std::shared_ptr<logging::Logger> logger)
 
 void WildLexer::ReadOne() {
     if (str_.data()[read_pos_] == '\0') {
-        derived_size = read_pos_;
         cur_char_ = 0;
     } else {
         cur_char_ = str_.data()[read_pos_];
@@ -133,7 +132,6 @@ Token WildLexer::NextToken() {
 
 void NormalLexer::ReadOne() {
     if (str_.data()[read_pos_] == '\0') {
-        derived_size = read_pos_;
         cur_char_ = 0;
     } else {
         cur_char_ = str_.data()[read_pos_];
@@ -156,15 +154,10 @@ Token NormalLexer::NextToken() {
             return resp_ident.value().param;
         } else if (resp.has_value() && resp.value().size == ident.size()) {
             return resp.value().param;
-        }
-        else {
+        } else {
             identifiers_.insert(ident, Token(TokenType::ident, ident));
             return Token(TokenType::ident, ident);
         } 
-        // else {
-        //     logger_->log("the fuck is this?");
-        //     throw std::runtime_error("the fuck is this?");
-        // }
     }
     logger_->log("NormalLexer: not ident ", str_.data() + cur_pos_);
     if (resp.has_value()) {

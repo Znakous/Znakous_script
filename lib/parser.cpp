@@ -69,6 +69,7 @@ Statement Parser::ParseStatement() {
     }
     
     logger_->log("Invalid statement encountered");
+    throw std::runtime_error("Invalid statement encountered");
 }
 
 Statement Parser::ParseAssignStatement() {

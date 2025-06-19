@@ -11,11 +11,9 @@
 
 
 struct ParseNum : BaseStd {
-    ParseNum() : BaseStd(std::cout) {}
-    ParseNum(std::ostream&, std::vector<Object>&&);
     ~ParseNum() = default;
     template<typename O>
-    Object operator()(O&) {
+    Object operator()(const O&) {
         throw std::runtime_error("ParseNum does not support this type");
         return CNull{};
     }

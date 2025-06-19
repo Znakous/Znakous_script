@@ -11,8 +11,6 @@
 
 template<RoundingMode mode>
 struct Round : BaseStd {
-    Round() : BaseStd(std::cout) {}
-    Round(std::ostream& out, std::vector<Object>&& args);
     ~Round() = default;
 
     Object Execute() {
@@ -20,7 +18,7 @@ struct Round : BaseStd {
     }
 
     template<typename T>
-    Object operator()(T& a) {
+    Object operator()(const T&) {
         throw std::runtime_error("Round does not support this type");
     }
 

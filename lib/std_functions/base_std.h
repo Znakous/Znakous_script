@@ -15,10 +15,10 @@ struct BaseStd {
         : out(out_)
     {}
     BaseStd(std::vector<Object>&& args_)
-     : out(std::nullopt), args(std::move(args_)) 
+     : args(std::move(args_)), out(std::nullopt)
     {}
     BaseStd(std::ostream& out_, std::vector<Object>&& args_)
-        : out(out_), args(std::move(args_))
+        : args(std::move(args_)), out(out_)
     {}
     virtual ~BaseStd() = default;
     std::vector<Object> args;

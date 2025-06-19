@@ -17,15 +17,10 @@ enum class StringTransform {
 
 template<StringTransform c>
 struct LowerUpper : BaseStd {
-    LowerUpper() : BaseStd(std::cout) {}
-    LowerUpper(std::ostream& out, std::vector<Object>&& args)
-     : BaseStd(out, std::move(args)) 
-    {}
     ~LowerUpper() = default;
 
-
     template<typename T>
-    Object operator()(T& a) {
+    Object operator()(const T&) {
         throw std::runtime_error("LowerUpper: argument is not a string");
     }
 

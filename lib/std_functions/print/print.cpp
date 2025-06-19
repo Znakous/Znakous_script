@@ -1,10 +1,5 @@
 #include "print.h"
 
-
-Print::Print(std::ostream& out, std::vector<Object>&& args_)
-    : BaseStd(out, std::move(args_))
-{}
-
 void Print::operator()(CArray& a) {
     out->get() << "[";
     for (size_t i = 0; i < a.arr.size(); ++i) {
