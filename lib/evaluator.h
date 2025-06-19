@@ -7,13 +7,13 @@
 #include <stdexcept>
 #include <exception>
 
-#include "usings.h"
-#include "trie.h"
-#include "environment.h"
-#include "operators_executor.h"
-#include "object.h"
-#include "ast/ast.h"
-#include "logger.h"
+#include <usings.h>
+#include <trie.h>
+#include <environment.h>
+#include <operators/operators_executor.h>
+#include <object.h>
+#include <ast/ast.h>
+#include <logger.h>
 #include <std_functions/std_func_spec.h>
 
 double stoi_view(std::string_view);

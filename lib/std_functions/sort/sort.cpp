@@ -1,5 +1,4 @@
 #include "sort.h"
-#include "visitor.h"
 #include <std_functions/truth_checker.h>
 
 #include <algorithm>

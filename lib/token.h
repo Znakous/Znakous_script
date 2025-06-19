@@ -31,7 +31,7 @@ enum class TokenType {
     slice_access,
     power,
     funny_assign, null,
-    bit_and, bit_or, bit_xor,
+    bit_and, bit_or, bit_xor, and_, or_, xor_
 };
 
 
@@ -85,8 +85,11 @@ constexpr std::pair<std::string_view, Token> keywords[] = {
     {"%", {TokenType::mod, std::nullopt}},
     {"^", {TokenType::power, std::nullopt}},
     {"&", {TokenType::bit_and, std::nullopt}},
+    {"&&", {TokenType::and_, std::nullopt}},
     {"|", {TokenType::bit_or, std::nullopt}},
-    {"`", {TokenType::bit_xor, std::nullopt}},
+    {"||", {TokenType::or_, std::nullopt}},
+    {"`", {TokenType::xor_, std::nullopt}},
+    {"``", {TokenType::bit_xor, std::nullopt}},
     {"==", {TokenType::eq, std::nullopt}},
     {"<", {TokenType::less, std::nullopt}},
     {">", {TokenType::greater, std::nullopt}},

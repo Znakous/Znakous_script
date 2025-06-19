@@ -6,7 +6,7 @@ add_library(itmoscript
     ${SOURCES}
 )
 add_subdirectory(std_functions)
-add_dependencies(itmoscript std_func_all)
+add_subdirectory(operators)
 
 target_include_directories(itmoscript PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}

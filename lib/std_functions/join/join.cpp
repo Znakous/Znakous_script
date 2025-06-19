@@ -1,5 +1,5 @@
 #include "join.h"
-#include "visitor.h"
+#include <operators/operators.h>
 
 Object Join::Execute() {
     return std::visit(*this, args[0], args[1]);

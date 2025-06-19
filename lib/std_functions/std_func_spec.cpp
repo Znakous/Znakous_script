@@ -4,7 +4,6 @@
 
 
 StdFuncGetter::StdFuncGetter(){
-    auto dummy = StdFuncVar{};
     auto names = GetNames<StdFuncVar, StdFuncVar>().names;
     for (auto& func : names) {
         StdFunc var = func.value;

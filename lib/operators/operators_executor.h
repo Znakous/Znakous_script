@@ -5,9 +5,9 @@
 
 #include "object.h"
 #include "token.h"
-#include "visitor.h"
+#include <operators/operators.h>
 #include "logger.h"
-// #include "std_functions.h"
+#include <get_name.h>
 
 
 
@@ -15,6 +15,12 @@ struct BinaryOperatorExecutor {
     BinaryOperatorExecutor(std::shared_ptr<logging::Logger> log)
      : logger_(log)
     {
+        using var = std::variant<operators>;
+        auto names = GetNames<var, var>().names;
+        for (auto& func : names) {
+            StdFunc var = func.value;
+            functions_.insert(func.name, var);
+        }
         #define ADD_VISITOR(oper, visitor) visitors.emplace(TokenType::oper, std::make_unique<visitor>(log))
         ADD_VISITOR(plus, AddVisitor);
         ADD_VISITOR(minus, SubVisitor);

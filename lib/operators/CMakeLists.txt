@@ -1,9 +1,11 @@
 file(GLOB HEADERS CONFIGURE_DEPENDS
     "**/*.h"
     "*.h"
-    EXCLUDE "std_func_spec.h"
-    EXCLUDE "std_func_all.h"
-) 
+    EXCLUDE "operators_executor.h"
+    EXCLUDE "operators.h"
+    EXCLUDE "operator_base.h"
+)
+message(STATUS ${HEADERS})
 
 
 set(HEADER_CONTENT "// Don't edit this file, it is auto-generated\n#pragma once\n")
@@ -12,8 +14,10 @@ foreach(HEADER ${HEADERS})
     string(APPEND HEADER_CONTENT "#include \"${HEADER_NAME}\"\n")
 endforeach()
 
+message(STATUS ${HEADER_CONTENT})
+
 set(CONTENT "// Don't edit this file, it is auto-generated\n#pragma once\n")
-string(APPEND CONTENT "#define functions \\\n   ")
+string(APPEND CONTENT "#define operators \\\n   ")
 set(NAMES_LIST)
 
 foreach(HEADER ${HEADERS})
@@ -42,11 +46,10 @@ else()
 endif()
 
 
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/std_func_all.h "${HEADER_CONTENT}")
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/std_func_names.h "${CONTENT}")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/operators_all.h "${HEADER_CONTENT}")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/operators_names.h "${CONTENT}")
 
 # тут путь до файла опрятнее получается, но команда зависима от текущей директории
-file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/../../build/std_func_all.h "${HEADER_CONTENT}")
-file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/../../build/std_func_names.h "${CONTENT}")
-
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/../../build/operators_all.h "${HEADER_CONTENT}")
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/../../build/operators_names.h "${CONTENT}")
 
